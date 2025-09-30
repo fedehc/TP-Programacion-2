@@ -1,0 +1,140 @@
+@startuml DriveHub_TP_Simple
+left to right direction
+skinparam classAttributeIconSize 0
+skinparam Shadowing false
+hide circle
+
+
+enum EstadoVehiculo {
+  DISPONIBLE
+  EN_ALQUILER
+  EN_MANTENIMIENTO
+  NECESITA_LIMPIEZA
+}
+enum EstadoReserva {
+  PENDIENTE
+  CONFIRMADA
+  CANCELADA
+  CUMPLIDA
+}
+
+
+class RangoDeFechas {
+  - inicio: Date
+  - fin: Date
+  + RangoDeFechas(inicio: Date, fin: Date)
+  + dias(): int
+  + seCruzaCon(otro: RangoDeFechas): boolean
+}
+
+
+class Cliente {
+  - id: String
+  - nombre: String
+}
+
+interface Tarifa {
+  + costoBasePorDia(): double
+  + cotizar(dias: int, kmRecorridos: int): double
+  + etiqueta(): String
+}
+
+abstract class TarifaBase implements Tarifa {
+  - basePorDia: double
+  - _etiqueta: String
+  + TarifaBase(basePorDia: double, etiqueta: String)
+  + costoBasePorDia(): double
+  + etiqueta(): String
+  {abstract} + cotizar(dias: int, kmRecorridos: int): double
+}
+
+class TarifaCompacto extends TarifaBase
+class TarifaSedan extends TarifaBase
+class TarifaSuv extends TarifaBase
+
+class Mantenimiento {
+  - fecha: Date
+  - costo: double
+  - descripcion: String
+}
+
+class Vehiculo {
+  - matricula: String
+  - estado: EstadoVehiculo
+  - kilometraje: int
+  - tarifa: Tarifa
+  - historial: List<Mantenimiento>
+  + Vehiculo(matricula: String, kmInicial: int, tarifa: Tarifa)
+  + etiquetaTarifa(): String
+  + cambiarEstado(nuevo: EstadoVehiculo): void
+  + actualizarKilometraje(kmNuevo: int): void
+  + registrarMantenimiento(m: Mantenimiento): void
+  + cotizar(dias: int, km: int): double
+  + estadoActual(): EstadoVehiculo
+  + kmActual(): int
+}
+Vehiculo o-- "*" Mantenimiento
+Vehiculo --> Tarifa
+
+class Reserva {
+  - id: String
+  - cliente: Cliente
+  - vehiculo: Vehiculo
+  - rango: RangoDeFechas
+  - estado: EstadoReserva
+  + Reserva(id: String, cliente: Cliente, vehiculo: Vehiculo, rango: RangoDeFechas)
+  + dias(): int
+  + confirmar(): void
+  + cancelar(): void
+  + marcarCumplida(): void
+  + estadoActual(): EstadoReserva
+}
+Reserva --> Cliente
+Reserva --> Vehiculo
+Reserva --> RangoDeFechas
+
+class Alquiler {
+  - id: String
+  - reserva: Reserva
+  - kmInicio: int
+  - kmFin: int
+  - costoTotal: double
+  - retirado: boolean
+  + Alquiler(id: String, reserva: Reserva)
+  + registrarRetiro(kmVehiculo: int): void
+  + registrarDevolucion(kmFinal: int): void
+  + obtenerCostoTotal(): double
+}
+Alquiler --> Reserva
+
+
+class DisponibilidadService {
+  {static} + estaDisponible(v: Vehiculo, r: RangoDeFechas, rs: List<Reserva>): boolean
+}
+
+class SistemaAlquiler {
+  - vehiculos: List<Vehiculo>
+  - reservas: List<Reserva>
+  - alquileres: List<Alquiler>
+  + registrarVehiculo(v: Vehiculo): void
+  + buscarVehiculo(matricula: String): Vehiculo
+  + crearReserva(c: Cliente, matricula: String, r: RangoDeFechas): Reserva
+  + confirmarReserva(id: String): void
+  + iniciarAlquiler(idReserva: String, kmInicio: int): Alquiler
+  + cerrarAlquiler(idAlquiler: String, kmFin: int): Alquiler
+}
+SistemaAlquiler o-- "*" Vehiculo
+SistemaAlquiler o-- "*" Reserva
+SistemaAlquiler o-- "*" Alquiler
+SistemaAlquiler ..> DisponibilidadService
+
+note bottom of TarifaCompacto
+  $30/día + $0.15/km excedente si kmTotales > 100·días
+end note
+note bottom of TarifaSedan
+  $50/día + $0.20/km (sin límite diario)
+end note
+note bottom of TarifaSuv
+  $80/día + $15/día seguro + $0.25/km si kmTotales > 500
+end note
+@enduml
