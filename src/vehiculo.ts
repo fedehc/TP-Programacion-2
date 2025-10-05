@@ -1,31 +1,31 @@
 import Tarifa from "./tarifa";
 import Mantenimiento from "./mantenimiento";
-import { CategoriaVehiculo } from "./enums";
+import { CategoriaVehiculo, EstadoVehiculo } from "./enums";
 
 
 export default abstract class Vehiculo {
     private categoria: CategoriaVehiculo;
     private matricula: string;
-    private estado: string;
+    private estado: EstadoVehiculo;
     private kilometraje: number;
     private tarifa: Tarifa;
     private mantenimientos: Mantenimiento[];
 
 
-    getCategoria(): CategoriaVehiculo {  return this.categoria; }
-    setCategoria(nuevaCat: CategoriaVehiculo) { this.categoria = nuevaCat; }
-    getMatricula(): string {  return this.matricula; }
-    setMatricula(nuevaMat: string) { this.matricula = nuevaMat; }
-    getEstado(): string { return this.estado; }
-    setEstado(nuevoEstado: string) { this.estado = nuevoEstado; }
-    getKilometraje(): number { return this.kilometraje; }
-    setKilometraje(nuevoKm: number) { this.kilometraje = nuevoKm; }
-    getTarifa(): Tarifa { return this.tarifa; }
-    setTarifa(nuevaTarifa: Tarifa) { this.tarifa = nuevaTarifa; }  
-    getMantenimiento(): Mantenimiento[] { return this.mantenimientos; }
-    setMantenimiento(nuevoMant: Mantenimiento[]) { this.mantenimientos = nuevoMant; }
+    public getCategoria(): CategoriaVehiculo { return this.categoria; }
+    public setCategoria(nuevaCat: CategoriaVehiculo):void  { this.categoria = nuevaCat; }
+    public getMatricula(): string {  return this.matricula; }
+    public setMatricula(nuevaMat: string):void  { this.matricula = nuevaMat; }
+    public getEstado(): EstadoVehiculo { return this.estado; }
+    public setEstado(nuevoEstado: EstadoVehiculo):void  { this.estado = nuevoEstado; }
+    public getKilometraje(): number { return this.kilometraje; }
+    public setKilometraje(nuevoKm: number):void  { this.kilometraje = nuevoKm; }
+    public getTarifa(): Tarifa { return this.tarifa; }
+    public setTarifa(nuevaTarifa: Tarifa):void  { this.tarifa = nuevaTarifa; }  
+    public getMantenimiento(): Mantenimiento[] { return this.mantenimientos; }
+    public setMantenimiento(nuevoMant: Mantenimiento[]):void { this.mantenimientos = nuevoMant; }
 
-
+    
     constructor(categoria: CategoriaVehiculo, matricula: string, estado: string, kilometraje: number,
                 tarifa: Tarifa, mantenimientos: Mantenimiento[]) {
         this.categoria = categoria;
