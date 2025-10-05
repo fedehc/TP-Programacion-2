@@ -1,3 +1,9 @@
+export enum CategoriaVehiculo {
+    compacto = "compacto",
+    sedan = "sedan",
+    suv = "suv"
+}
+
 export enum EstadoVehiculo {
     disponible = "Disponible",
     alquiler = "En Alquiler",
