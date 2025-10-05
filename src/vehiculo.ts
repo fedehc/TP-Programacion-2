@@ -1,5 +1,5 @@
-import Tarifa from "./tarifa.ts";
-import Mantenimiento from "./mantenimiento.ts";
+import Tarifa from "./tarifa";
+import Mantenimiento from "./mantenimiento";
 
 
 export default abstract class Vehiculo {
