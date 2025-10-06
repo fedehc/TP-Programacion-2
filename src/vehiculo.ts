@@ -3,7 +3,7 @@ import Mantenimiento from "./mantenimiento";
 import { CategoriaVehiculo, EstadoVehiculo } from "./enums";
 
 
-export default abstract class Vehiculo {
+export default class Vehiculo {
     private categoria: CategoriaVehiculo;
     private matricula: string;
     private estado: EstadoVehiculo;
