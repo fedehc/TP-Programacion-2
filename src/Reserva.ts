@@ -1,8 +1,48 @@
-export default class Reserva{
-  private id: string;
-  private cliente: Cliente;
-  private vehiculo: Vehiculo;
-  private fechaInicio: date:
-  private fechaFin: date:
-  private estado: EstadoReserva = EstadoReserva.PENDIENTE;
+
+export class Reserva {
+  private readonly id: string;
+  private readonly cliente: Cliente;
+  private readonly vehiculo: Vehiculo;
+  private readonly rangoReservado: RangoDeFechas;
+  private estado: EstadoReserva;
+
+  constructor(id: string, cliente: Cliente, vehiculo: Vehiculo, rangoReservado: RangoDeFechas) {
+    this.id = id;
+    this.cliente = cliente;
+    this.vehiculo = vehiculo;
+    this.rangoReservado = rangoReservado;
+    this.estado = EstadoReserva.PENDIENTE;
+  }
+
+  public diasReservados(): number {
+    return this.rangoReservado.dias();
+  }
+  public confirmarReserva(): void {
+    if (this.estado === EstadoReserva.PENDIENTE) this.estado = EstadoReserva.CONFIRMADA;
+  }
+  public cancelarReserva(): void { this.estado = EstadoReserva.CANCELADA; }
+
+  public marcarReservaComoCumplida(): void {
+    this.estado = EstadoReserva.CUMPLIDA;
+  }
+
+  public estadoActual(): EstadoReserva {
+    return this.estado;
+  }
+
+  public obtenerVehiculo(): Vehiculo {
+    return this.vehiculo;
+  }
+
+  public obtenerCliente(): Cliente {
+    return this.cliente;
+  }
+
+  public obtenerRangoReservado(): RangoDeFechas {
+    return this.rangoReservado;
+  }
+
+  public obtenerId(): string {
+    return this.id;
+  }
 }
