@@ -1,3 +1,7 @@
+import Cliente from "./cliente";
+import { EstadoReserva } from "./enums";
+import RangoDeFechas from "./rangoDeFechas";
+import Vehiculo from "./vehiculo";
 
 export class Reserva {
   private readonly id: string;
