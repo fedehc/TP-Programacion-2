@@ -1,9 +1,9 @@
 
 export class Reserva {
-  private readonly id: string;
-  private readonly cliente: Cliente;
-  private readonly vehiculo: Vehiculo;
-  private readonly rangoReservado: RangoDeFechas;
+  private id: string;
+  private cliente: Cliente;
+  private vehiculo: Vehiculo;
+  private rangoReservado: RangoDeFechas;
   private estado: EstadoReserva;
 
   constructor(id: string, cliente: Cliente, vehiculo: Vehiculo, rangoReservado: RangoDeFechas) {
