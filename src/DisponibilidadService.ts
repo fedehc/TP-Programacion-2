@@ -1,12 +1,10 @@
-import { Reserva } from "./Reserva";
+import RangoDeFechas from "./rangoDeFechas";
 
-export class DisponibilidadService {
-
-  public static estaDisponible(vehiculo: Vehiculo, rango: RangoDeFechas, reservas: Reserva[]): boolean {
-     const reservasDelVehiculo = reservas.filter(
-      r => r.obtenerVehiculo().obtenerMatricula() === vehiculo.obtenerMatricula()
-    );
-    return !reservasDelVehiculo.some(r => r.obtenerRangoReservado().tieneInterseccion(rango));
+export default class DisponibilidadService {
+  static estaLibre(rangoPedido: RangoDeFechas, bloqueos: RangoDeFechas[]): boolean {
+    for (const b of bloqueos) {
+      if (rangoPedido.seCruzaCon(b)) return false;
+    }
+    return true;
   }
-  
 }
