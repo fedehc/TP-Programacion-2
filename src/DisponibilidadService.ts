@@ -1,4 +1,5 @@
-import { Reserva } from "./Reserva";
+import RangoDeFechas from "./rangoDeFechas";
+import Reserva from "./reserva";
 import Vehiculo from "./vehiculo";
 
 export class DisponibilidadService {

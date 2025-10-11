@@ -3,7 +3,7 @@ import { EstadoReserva } from "./enums";
 import RangoDeFechas from "./rangoDeFechas";
 import Vehiculo from "./vehiculo";
 
-export class Reserva {
+export default class Reserva {
   private readonly id: string;
   private readonly cliente: Cliente;
   private readonly vehiculo: Vehiculo;
@@ -15,19 +15,19 @@ export class Reserva {
     this.cliente = cliente;
     this.vehiculo = vehiculo;
     this.rangoReservado = rangoReservado;
-    this.estado = EstadoReserva.PENDIENTE;
+    this.estado = EstadoReserva.pendiente;
   }
 
   public diasReservados(): number {
     return this.rangoReservado.dias();
   }
   public confirmarReserva(): void {
-    if (this.estado === EstadoReserva.PENDIENTE) this.estado = EstadoReserva.CONFIRMADA;
+    if (this.estado === EstadoReserva.pendiente) this.estado = EstadoReserva.confirmada;
   }
-  public cancelarReserva(): void { this.estado = EstadoReserva.CANCELADA; }
+  public cancelarReserva(): void { this.estado = EstadoReserva.cancelada; }
 
   public marcarReservaComoCumplida(): void {
-    this.estado = EstadoReserva.CUMPLIDA;
+    this.estado = EstadoReserva.cumplida;
   }
 
   public estadoActual(): EstadoReserva {
