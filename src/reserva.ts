@@ -1,52 +1,55 @@
-import Cliente from "./cliente";
 import { EstadoReserva } from "./enums";
 import RangoDeFechas from "./rangoDeFechas";
 import Vehiculo from "./vehiculo";
 
+
 export class Reserva {
+
   private id: string;
-  private cliente: Cliente;
-  private vehiculo: Vehiculo;
-  private rangoReservado: RangoDeFechas;
+  private clienteId: string;
+  private rango: RangoDeFechas;
   private estado: EstadoReserva;
+  private vehiculo?: Vehiculo;
 
-  constructor(id: string, cliente: Cliente, vehiculo: Vehiculo, rangoReservado: RangoDeFechas) {
+  constructor(id: string, clienteId: string, rango: RangoDeFechas, estado: EstadoReserva = EstadoReserva.pendiente, vehiculo?: Vehiculo) {
     this.id = id;
-    this.cliente = cliente;
+    this.clienteId = clienteId;
+    this.rango = rango;
+    this.estado = estado;
     this.vehiculo = vehiculo;
-    this.rangoReservado = rangoReservado;
-    this.estado = EstadoReserva.PENDIENTE;
   }
 
-  public diasReservados(): number {
-    return this.rangoReservado.dias();
-  }
-  public confirmarReserva(): void {
-    if (this.estado === EstadoReserva.PENDIENTE) this.estado = EstadoReserva.CONFIRMADA;
-  }
-  public cancelarReserva(): void { this.estado = EstadoReserva.CANCELADA; }
-
-  public marcarReservaComoCumplida(): void {
-    this.estado = EstadoReserva.CUMPLIDA;
+  public getId(): string {
+    return this.id;
   }
 
-  public estadoActual(): EstadoReserva {
+  public getClienteId(): string {
+    return this.clienteId;
+  }
+
+  public getRango(): RangoDeFechas {
+    return this.rango;
+  }
+
+  public getEstado(): EstadoReserva {
     return this.estado;
   }
 
-  public obtenerVehiculo(): Vehiculo {
+  public getVehiculo(): Vehiculo | undefined {
     return this.vehiculo;
   }
 
-  public obtenerCliente(): Cliente {
-    return this.cliente;
+  public marcarCumplida() {
+    this.estado = EstadoReserva.confirmada;
   }
 
-  public obtenerRangoReservado(): RangoDeFechas {
-    return this.rangoReservado;
+  public confirmarConVehiculo(v: Vehiculo): void {
+    this.vehiculo = v;
+    this.estado = EstadoReserva.confirmada;
   }
 
-  public obtenerId(): string {
-    return this.id;
+  public cancelar(): void {
+    this.estado = EstadoReserva.cancelada;
+    this.vehiculo = undefined;
   }
 }
