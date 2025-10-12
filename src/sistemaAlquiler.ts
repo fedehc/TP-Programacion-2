@@ -9,45 +9,30 @@ import Reserva from "./reserva";
 import Vehiculo from "./vehiculo";
 
 
-
-
 export default class SistemaAlquiler {
   constructor(
     private gestorVehiculo: GestorVehiculo,
     private gestorReserva: GestorReserva,
     private gestorAlquiler: GestorAlquiler
-  ) {}
+  ) { }
 
-  public agregarVehiculo(v: Vehiculo): void {
-    this.gestorVehiculo.agregar(v);
-  }
+  public agregarVehiculo(v: Vehiculo): void { this.gestorVehiculo.agregar(v); }
+  public listarVehiculos(): Vehiculo[] { return this.gestorVehiculo.listar(); }
+  public listarReservas(): Reserva[] { return this.gestorReserva.listar(); }
 
-  public listarVehiculos(): Vehiculo[] {
-    return this.gestorVehiculo.listar();
-  }
-
-  public listarReservas(): Reserva[] {
-    return this.gestorReserva.listar();
-  }
-
-  public crearReservaPendiente(
-    clienteId: string,
-    fechaInicio: Date,
-    fechaFin: Date
-  ): Reserva {
+  public crearReservaPendiente(clienteId: string, fechaInicio: Date, fechaFin: Date): Reserva {
     return this.gestorReserva.crearPendiente(clienteId, fechaInicio, fechaFin);
   }
 
-  public buscarVehiculoDisponible(
-    categoria: CategoriaVehiculo,
-    rangoPedido: RangoDeFechas
-  ): Vehiculo | null {
+  public buscarVehiculoDisponible(categoria: CategoriaVehiculo, rangoPedido: RangoDeFechas): Vehiculo | null {
     const candidatos = this.gestorVehiculo.filtrarPorCategoria(categoria);
 
-    for (const v of candidatos) {
-      const bloqueos = this.gestorReserva.bloqueosDeVehiculo(v);
+    for (const c of candidatos) {
+      const bloqueos = this.gestorReserva.bloqueosDeVehiculo(c);
       const estaLibre = DisponibilidadService.estaLibre(rangoPedido, bloqueos);
-      if (estaLibre) return v;
+      if (estaLibre) {
+        return c;
+      }
     }
     return null;
   }
@@ -65,7 +50,5 @@ export default class SistemaAlquiler {
     this.gestorAlquiler.finalizar(alquiler, kmFinal, fechaActual);
   }
 
-  public listarAlquileres(): Alquiler[] {
-    return this.gestorAlquiler.listar();
-  }
+  public listarAlquileres(): Alquiler[] { return this.gestorAlquiler.listar(); }
 }
