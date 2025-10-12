@@ -3,7 +3,7 @@ import RangoDeFechas from "./rangoDeFechas";
 import Vehiculo from "./vehiculo";
 
 
-export class Reserva {
+export default class Reserva {
 
   private id: string;
   private clienteId: string;
@@ -11,7 +11,13 @@ export class Reserva {
   private estado: EstadoReserva;
   private vehiculo?: Vehiculo;
 
-  constructor(id: string, clienteId: string, rango: RangoDeFechas, estado: EstadoReserva = EstadoReserva.pendiente, vehiculo?: Vehiculo) {
+  constructor(
+    id: string,
+    clienteId: string,
+    rango: RangoDeFechas,
+    estado: EstadoReserva = EstadoReserva.pendiente,
+    vehiculo?: Vehiculo
+  ) {
     this.id = id;
     this.clienteId = clienteId;
     this.rango = rango;
@@ -37,6 +43,10 @@ export class Reserva {
 
   public getVehiculo(): Vehiculo | undefined {
     return this.vehiculo;
+  }
+
+  public getVehiculoMatricula(): string | undefined {
+    return this.vehiculo?.getMatricula();
   }
 
   public marcarCumplida() {
