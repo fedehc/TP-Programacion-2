@@ -1,6 +1,6 @@
 export default class RangoDeFechas {
-  readonly inicio: Date;
-  readonly fin: Date;
+  private inicio: Date;
+  private fin: Date;
 
     constructor(inicio: Date | string, fin: Date | string) {
     this.inicio = new Date(inicio);
