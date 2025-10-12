@@ -17,3 +17,8 @@ export enum EstadoReserva {
     cancelada,
     cumplida
 }
+
+export enum EstadoAlquiler {
+  activo = "activo",
+  finalizado = "finalizado",
+}
