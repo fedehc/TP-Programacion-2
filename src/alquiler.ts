@@ -1,7 +1,6 @@
 import { EstadoAlquiler } from "./enums";
 import RangoDeFechas from "./rangoDeFechas";
 import Reserva from "./reserva";
-
 import Vehiculo from "./vehiculo";
 
 
@@ -14,45 +13,19 @@ export default class Alquiler {
         private rango: RangoDeFechas,
         private kilometrajeInicial: number,
         private kilometrajeFinal?: number,
-        private estado: EstadoAlquiler= EstadoAlquiler.activo,
+        private estado: EstadoAlquiler = EstadoAlquiler.activo,
         private costoTotal?: number
     ) { }
 
-    public getId(): string {
-        return this.id;
-    }
-
-    public getReserva(): Reserva {
-        return this.reserva;
-    }
-
-    public getVehiculo(): Vehiculo {
-        return this.vehiculo;
-    }
-
-    public getClienteId(): string {
-        return this.clienteId;
-    }
-
-    public getRango(): RangoDeFechas {
-        return this.rango;
-    }
-
-    public getKilometrajeInicial(): number {
-        return this.kilometrajeInicial;
-    }
-
-    public getKilometrajeFinal(): number | undefined {
-        return this.kilometrajeFinal;
-    }
-
-    public getEstado(): EstadoAlquiler {
-        return this.estado;
-    }
-
-    public getCostoTotal(): number | undefined {
-        return this.costoTotal;
-    }
+    public getId(): string { return this.id; }
+    public getReserva(): Reserva { return this.reserva; }
+    public getVehiculo(): Vehiculo { return this.vehiculo; }
+    public getClienteId(): string { return this.clienteId; }
+    public getRango(): RangoDeFechas { return this.rango; }
+    public getKilometrajeInicial(): number { return this.kilometrajeInicial; }
+    public getKilometrajeFinal(): number | undefined { return this.kilometrajeFinal; }
+    public getEstado(): EstadoAlquiler { return this.estado; }
+    public getCostoTotal(): number | undefined { return this.costoTotal; }
 
     public validarFinalizacion(kmFinal: number): void {
         if (this.estado !== EstadoAlquiler.activo) {
@@ -78,10 +51,8 @@ export default class Alquiler {
 
     public finalizar(kmFinal: number): void {
         this.validarFinalizacion(kmFinal);
-
         this.kilometrajeFinal = kmFinal;
         this.costoTotal = this.calcularCostoTotal();
         this.estado = EstadoAlquiler.finalizado;
     }
-
 }
