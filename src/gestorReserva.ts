@@ -1,7 +1,8 @@
 import { EstadoReserva } from "./enums";
 import RangoDeFechas from "./rangoDeFechas";
-import { Reserva } from "./reserva";
+import Reserva from "./reserva";
 import Vehiculo from "./vehiculo";
+
 
 
 export default class GestorReserva {
@@ -18,7 +19,7 @@ export default class GestorReserva {
   }
 
   public listar(): Reserva[] {
-    return [...this.reservas];
+    return this.reservas;
   }
 
   public bloqueosDeVehiculo(vehiculo: Vehiculo): RangoDeFechas[] {
