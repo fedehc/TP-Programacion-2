@@ -4,13 +4,15 @@ import Reserva from "./reserva";
 import Vehiculo from "./vehiculo";
 
 
-
 export default class GestorReserva {
-  private reservas: Reserva[] = [];
+  constructor(
+    private reservas: Reserva[] = []
+  ) { }
 
-  public agregar(r: Reserva): void {
-    this.reservas.push(r);
-  }
+
+  public agregar(r: Reserva): void { this.reservas.push(r); }
+  public listar(): Reserva[] { return this.reservas; }
+  private generarIdReserva(): string { return "R-" + Date.now(); }
 
   public crearPendiente(clienteId: string, fechaInicio: Date, fechaFin: Date): Reserva {
     const rango = new RangoDeFechas(fechaInicio, fechaFin);
@@ -18,16 +20,14 @@ export default class GestorReserva {
     return nueva;
   }
 
-  public listar(): Reserva[] {
-    return this.reservas;
-  }
-
   public bloqueosDeVehiculo(vehiculo: Vehiculo): RangoDeFechas[] {
     const bloqueos: RangoDeFechas[] = [];
     for (const r of this.reservas) {
       const mismoVehiculo = r.getVehiculo()?.getMatricula() === vehiculo.getMatricula();
       const confirmada = r.getEstado() === EstadoReserva.confirmada;
-      if (mismoVehiculo && confirmada) bloqueos.push(r.getRango());
+      if (mismoVehiculo && confirmada) {
+        bloqueos.push(r.getRango());
+      }
     }
     return bloqueos;
   }
@@ -40,9 +40,5 @@ export default class GestorReserva {
       reserva.cancelar();
     }
     return reserva;
-  }
-
-  private generarIdReserva(): string {
-    return "R-" + Date.now();
   }
 }
