@@ -3,12 +3,15 @@ import { EstadoVehiculo } from "./enums";
 import Reserva from "./reserva";
 import Vehiculo from "./vehiculo";
 
-export default class GestorAlquiler {
-  private alquileres: Alquiler[] = [];
 
-  public agregar(a: Alquiler): void {
-    this.alquileres.push(a);
-  }
+export default class GestorAlquiler {
+  constructor(
+    private alquileres: Alquiler[] = []
+  ) { }
+
+  
+  public agregar(a: Alquiler): void { this.alquileres.push(a); }
+  public listar(): Alquiler[] { return this.alquileres; }
 
   public crear(reserva: Reserva, vehiculo: Vehiculo): Alquiler {
     const nuevo = new Alquiler(
@@ -24,10 +27,7 @@ export default class GestorAlquiler {
     return nuevo;
   }
 
-  public iniciarAlquileresProgramadosDelDia(
-    reservas: Reserva[],
-    fechaActual: Date = new Date()
-  ): Alquiler[] {
+  public iniciarAlquileresProgramadosDelDia(reservas: Reserva[], fechaActual: Date = new Date()): Alquiler[] {
     const iniciados: Alquiler[] = [];
     for (const r of reservas) {
       const vehiculo = r.getVehiculo();
@@ -44,9 +44,5 @@ export default class GestorAlquiler {
     const vehiculo = alquiler.getVehiculo();
     vehiculo.setKilometraje(kmFinal);
     vehiculo.setEstado(EstadoVehiculo.limpieza);
-  }
-
-  public listar(): Alquiler[] {
-    return this.alquileres;
   }
 }
