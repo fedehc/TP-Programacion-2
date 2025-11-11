@@ -1,8 +1,11 @@
+import DisponibilidadService from "./disponibilidadService";
 import { CategoriaVehiculo, EstadoVehiculo } from "./enums";
+import RangoDeFechas from "./rangoDeFechas";
 import Tarifa from "./tarifa";
 
 
 export default class Vehiculo {
+  private bloqueos: RangoDeFechas[] = [];
   constructor(
     private matricula: string,
     private categoria: CategoriaVehiculo,
@@ -18,4 +21,24 @@ export default class Vehiculo {
   public getKilometraje(): number { return this.kilometraje; }
   public setEstado(nuevo: EstadoVehiculo) { this.estado = nuevo; }
   public setKilometraje(nuevoKilometraje: number) { this.kilometraje = nuevoKilometraje; }
+
+  public getRangosBloqueados(): ReadonlyArray<RangoDeFechas> {
+    return this.bloqueos;
+  }
+
+  public bloquear(rango: RangoDeFechas): void {
+    this.bloqueos.push(rango);
+  }
+
+  public desbloquear(rango: RangoDeFechas): void {
+    this.bloqueos = this.bloqueos.filter(b => b !== rango);
+  }
+
+  public limpiarBloqueos(): void {
+    this.bloqueos = [];
+  }
+
+  public estaDisponible(periodo: RangoDeFechas): boolean {
+    return DisponibilidadService.estaLibre(periodo, this.bloqueos);
+  }
 }

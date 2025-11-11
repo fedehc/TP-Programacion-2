@@ -24,18 +24,16 @@ export default class SistemaAlquiler {
     return this.gestorReserva.crearPendiente(clienteId, fechaInicio, fechaFin);
   }
 
-  public buscarVehiculoDisponible(categoria: CategoriaVehiculo, rangoPedido: RangoDeFechas): Vehiculo | null {
-    const candidatos = this.gestorVehiculo.filtrarPorCategoria(categoria);
+public buscarVehiculoDisponible(categoria: CategoriaVehiculo, rangoPedido: RangoDeFechas): Vehiculo | null {
+  const candidatos = this.gestorVehiculo.filtrarPorCategoria(categoria);
 
-    for (const c of candidatos) {
-      const bloqueos = this.gestorReserva.bloqueosDeVehiculo(c);
-      const estaLibre = DisponibilidadService.estaLibre(rangoPedido, bloqueos);
-      if (estaLibre) {
-        return c;
-      }
+  for (const v of candidatos) {
+    if (v.estaDisponible(rangoPedido)) {
+      return v;
     }
-    return null;
   }
+  return null;
+}
 
   public ConfirmarReserva(reserva: Reserva, categoria: CategoriaVehiculo): Reserva {
     const vehiculo = this.buscarVehiculoDisponible(categoria, reserva.getRango());
