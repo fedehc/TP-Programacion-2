@@ -1,4 +1,5 @@
 import { EstadoAlquiler } from "./enums";
+import ServicioDePrecios from "./precioService";
 import RangoDeFechas from "./rangoDeFechas";
 import Reserva from "./reserva";
 import Vehiculo from "./vehiculo";
@@ -17,15 +18,38 @@ export default class Alquiler {
         private costoTotal?: number
     ) { }
 
-    public getId(): string { return this.id; }
-    public getReserva(): Reserva { return this.reserva; }
-    public getVehiculo(): Vehiculo { return this.vehiculo; }
+    public getId(): string {
+        return this.id;
+    }
+
+    public getReserva(): Reserva {
+        return this.reserva;
+    }
+
+    public getVehiculo(): Vehiculo {
+        return this.vehiculo;
+    }
     public getClienteId(): string { return this.clienteId; }
-    public getRango(): RangoDeFechas { return this.rango; }
-    public getKilometrajeInicial(): number { return this.kilometrajeInicial; }
-    public getKilometrajeFinal(): number | undefined { return this.kilometrajeFinal; }
-    public getEstado(): EstadoAlquiler { return this.estado; }
-    public getCostoTotal(): number | undefined { return this.costoTotal; }
+
+    public getRango(): RangoDeFechas {
+        return this.rango;
+    }
+
+    public getKilometrajeInicial(): number {
+        return this.kilometrajeInicial;
+    }
+
+    public getKilometrajeFinal(): number | undefined {
+        return this.kilometrajeFinal;
+    }
+
+    public getEstado(): EstadoAlquiler {
+        return this.estado;
+    }
+
+    public getCostoTotal(): number | undefined {
+        return this.costoTotal;
+    }
 
     public validarFinalizacion(kmFinal: number): void {
         if (this.estado !== EstadoAlquiler.activo) {
@@ -46,7 +70,8 @@ export default class Alquiler {
     public calcularCostoTotal(): number {
         const dias = this.rango.diasDeDiferencia();
         const kmRecorridos = this.getKmRecorridos();
-        return this.vehiculo.getTarifa().calcularCosto(dias, kmRecorridos);
+        const base = this.vehiculo.getTarifa().calcularCosto(dias, kmRecorridos);
+        return ServicioDePrecios.aplicar(base, this.rango);
     }
 
     public finalizar(kmFinal: number): void {
