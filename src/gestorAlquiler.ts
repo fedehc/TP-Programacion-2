@@ -1,17 +1,23 @@
 import Alquiler from "./alquiler";
 import { EstadoVehiculo } from "./enums";
+import { IMantenimientoPolicy } from "./IPoliticaMantenimiento";
 import Reserva from "./reserva";
 import Vehiculo from "./vehiculo";
 
-
 export default class GestorAlquiler {
   constructor(
+    private readonly policy: IMantenimientoPolicy,
     private alquileres: Alquiler[] = []
   ) { }
 
-  
-  public agregar(a: Alquiler): void { this.alquileres.push(a); }
-  public listar(): Alquiler[] { return this.alquileres; }
+
+  public agregar(a: Alquiler): void {
+    this.alquileres.push(a);
+  }
+
+  public listar(): Alquiler[] {
+    return this.alquileres;
+  }
 
   public crear(reserva: Reserva, vehiculo: Vehiculo): Alquiler {
     const nuevo = new Alquiler(
@@ -43,6 +49,9 @@ export default class GestorAlquiler {
     alquiler.finalizar(kmFinal);
     const vehiculo = alquiler.getVehiculo();
     vehiculo.setKilometraje(kmFinal);
-    vehiculo.setEstado(EstadoVehiculo.limpieza);
+    vehiculo.getFichaMantenimiento().registrarAlquilerCompletado();
+    const requiere = this.policy.requiere(_fechaActual, kmFinal, vehiculo.getFichaMantenimiento());
+    if (requiere) vehiculo.setEstado(EstadoVehiculo.mantenimiento); else vehiculo.setEstado(EstadoVehiculo.limpieza);
   }
+
 }
