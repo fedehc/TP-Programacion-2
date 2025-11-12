@@ -10,7 +10,15 @@ export default class RangoDeFechas {
       throw new Error("Rango inválido: inicio debe ser anterior a fin.");
     }
   }
+  
+  public getInicio():Date{
+    return this.inicio;
+  }
 
+  public getFin():Date{
+    return this.inicio;
+  }
+  
   private normalizarFecha(fecha: Date): Date {
     const nuevaFecha = new Date(fecha);
     nuevaFecha.setHours(0, 0, 0, 0);
@@ -38,4 +46,9 @@ export default class RangoDeFechas {
     const diff = this.fin.getTime() - this.inicio.getTime();
     return Math.ceil(diff / msPorDia);
   }
+
+  public esIgualA(otro: RangoDeFechas): boolean {
+  return this.getInicio().getTime() === otro.getInicio().getTime()
+      && this.getFin().getTime() === otro.getFin().getTime();
+}
 }
