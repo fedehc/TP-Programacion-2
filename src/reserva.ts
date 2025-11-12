@@ -12,13 +12,32 @@ export default class Reserva {
     private vehiculo?: Vehiculo
   ) { }
 
-  public getId(): string { return this.id; }
-  public getClienteId(): string { return this.clienteId; }
-  public getRango(): RangoDeFechas { return this.rango; }
-  public getEstado(): EstadoReserva { return this.estado; }
-  public getVehiculo(): Vehiculo | undefined { return this.vehiculo; }
-  public getVehiculoMatricula(): string | undefined { return this.vehiculo?.getMatricula(); }
-  public marcarCumplida() { this.estado = EstadoReserva.confirmada; }
+  public getId(): string {
+    return this.id;
+  }
+
+  public getClienteId(): string {
+    return this.clienteId;
+
+  }
+  public getRango(): RangoDeFechas {
+    return this.rango;
+  }
+  public getEstado(): EstadoReserva {
+    return this.estado;
+  }
+
+  public getVehiculo(): Vehiculo | undefined {
+    return this.vehiculo;
+  }
+
+  public getVehiculoMatricula(): string | undefined {
+    return this.vehiculo?.getMatricula();
+  }
+
+  public marcarCumplida() {
+    this.estado = EstadoReserva.cumplida;
+  }
 
   public confirmarConVehiculo(v: Vehiculo): void {
     this.vehiculo = v;
