@@ -1,140 +1,189 @@
-@startuml DriveHub_TP_Simple
-left to right direction
+@startuml
+skinparam style strictuml
 skinparam classAttributeIconSize 0
-skinparam Shadowing false
-hide circle
 
-
-enum EstadoVehiculo {
-  DISPONIBLE
-  EN_ALQUILER
-  EN_MANTENIMIENTO
-  NECESITA_LIMPIEZA
-}
-enum EstadoReserva {
-  PENDIENTE
-  CONFIRMADA
-  CANCELADA
-  CUMPLIDA
+' ==== INTERFACES ====
+interface CriterioMantenimiento {
+  + cumple(hoy: Date, kmActual: number, ficha: FichaMantenimiento)
 }
 
-
-class RangoDeFechas {
-  - inicio: Date
-  - fin: Date
-  + RangoDeFechas(inicio: Date, fin: Date)
-  + dias(): int
-  + seCruzaCon(otro: RangoDeFechas): boolean
-}
-
-
-class Cliente {
-  - id: String
-  - nombre: String
+interface IMantenimientoPolicy {
+  + requiere(hoy: Date, kmActual: number, ficha: FichaMantenimiento)
 }
 
 interface Tarifa {
-  + costoBasePorDia(): double
-  + cotizar(dias: int, kmRecorridos: int): double
-  + etiqueta(): String
+  + calcularCosto(dias: number, kmRecorridos: number)
 }
 
-abstract class TarifaBase implements Tarifa {
-  - basePorDia: double
-  - _etiqueta: String
-  + TarifaBase(basePorDia: double, etiqueta: String)
-  + costoBasePorDia(): double
-  + etiqueta(): String
-  {abstract} + cotizar(dias: int, kmRecorridos: int): double
+interface Temporada {
+  + obtenerFactor()
+  + aplicarCostoBase(costoBase: number)
 }
 
-class TarifaCompacto extends TarifaBase
-class TarifaSedan extends TarifaBase
-class TarifaSuv extends TarifaBase
+' ==== MANTENIMIENTO ====
+class CriterioPorAlquileres implements CriterioMantenimiento {
+  + constructor(umbralAlquileres: number)
+  + cumple(_hoy: Date, _kmActual: number, ficha: FichaMantenimiento)
+}
 
-class Mantenimiento {
-  - fecha: Date
-  - costo: double
-  - descripcion: String
+class CriterioPorKilometraje implements CriterioMantenimiento {
+  + constructor(umbralKm: number)
+  + cumple(_hoy: Date, kmActual: number, ficha: FichaMantenimiento)
+}
+
+class CriterioPorMeses implements CriterioMantenimiento {
+  + constructor(umbralMeses: number)
+  + diffMeses(desde: Date, hasta: Date)
+  + cumple(hoy: Date, _kmActual: number, ficha: FichaMantenimiento)
+}
+
+class EvaluadorMantenimientoPorCriterios implements IMantenimientoPolicy {
+  + constructor(criterios: CriterioMantenimiento[])
+  + requiere(hoy: Date, kmActual: number, ficha: FichaMantenimiento)
+}
+
+class FichaMantenimiento {
+  - fechaUltimo: Date
+  - kmUltimo: number
+  - alquileresDesdeUltimo: number = 0
+  + registrarMantenimiento(hoy: Date, kmActual: number, _costo: number)
+  + registrarAlquilerCompletado()
+  + huboAlgunaVezMantenimiento()
+  + getters_y_setters()
+}
+
+' ==== NÚCLEO DEL DOMINIO ====
+class RangoDeFechas {
+  - inicio: Date
+  - fin: Date
+  + constructor(inicio: Date | string, fin: Date | string)
+  + normalizarFecha(fecha: Date)
+  + seCruzaCon(otro: RangoDeFechas)
+  + esMismoDiaQueInicio(fecha: Date)
+  + esAntesDeFin(fecha: Date)
+  + esIgualOPosteriorAFin(fecha: Date)
+  + diasDeDiferencia()
+  + esIgualA(otro: RangoDeFechas)
+  + getters_y_setters()
 }
 
 class Vehiculo {
-  - matricula: String
-  - estado: EstadoVehiculo
-  - kilometraje: int
-  - tarifa: Tarifa
-  - historial: List<Mantenimiento>
-  + Vehiculo(matricula: String, kmInicial: int, tarifa: Tarifa)
-  + etiquetaTarifa(): String
-  + cambiarEstado(nuevo: EstadoVehiculo): void
-  + actualizarKilometraje(kmNuevo: int): void
-  + registrarMantenimiento(m: Mantenimiento): void
-  + cotizar(dias: int, km: int): double
-  + estadoActual(): EstadoVehiculo
-  + kmActual(): int
+  - bloqueos: RangoDeFechas[]
+  - fichaMantenimiento: FichaMantenimiento
+  + bloquear(rango: RangoDeFechas)
+  + desbloquear(rango: RangoDeFechas)
+  + limpiarBloqueos()
+  + estaDisponible(periodo: RangoDeFechas)
+  + notificarAlquilerCompletado()
+  + marcarEnMantenimiento()
+  + marcarLimpieza()
+  + marcarDisponible()
+  + getters_y_setters()
 }
-Vehiculo o-- "*" Mantenimiento
-Vehiculo --> Tarifa
 
 class Reserva {
-  - id: String
-  - cliente: Cliente
-  - vehiculo: Vehiculo
-  - rango: RangoDeFechas
-  - estado: EstadoReserva
-  + Reserva(id: String, cliente: Cliente, vehiculo: Vehiculo, rango: RangoDeFechas)
-  + dias(): int
-  + confirmar(): void
-  + cancelar(): void
-  + marcarCumplida(): void
-  + estadoActual(): EstadoReserva
+  + marcarCumplida()
+  + confirmarConVehiculo(v: Vehiculo)
+  + cancelar()
+  + getters_y_setters()
 }
-Reserva --> Cliente
-Reserva --> Vehiculo
-Reserva --> RangoDeFechas
 
 class Alquiler {
-  - id: String
-  - reserva: Reserva
-  - kmInicio: int
-  - kmFin: int
-  - costoTotal: double
-  - retirado: boolean
-  + Alquiler(id: String, reserva: Reserva)
-  + registrarRetiro(kmVehiculo: int): void
-  + registrarDevolucion(kmFinal: int): void
-  + obtenerCostoTotal(): double
+  + validarFinalizacion(kmFinal: number)
+  + calcularCostoTotal()
+  + finalizar(kmFinal: number)
+  + getters_y_setters()
 }
-Alquiler --> Reserva
 
+class Cliente {
+  + getters_y_setters()
+}
 
+' SERVICIOS 
 class DisponibilidadService {
-  {static} + estaDisponible(v: Vehiculo, r: RangoDeFechas, rs: List<Reserva>): boolean
+  + estaLibre(rangoPedido: RangoDeFechas, bloqueos: RangoDeFechas[])
 }
 
+class ServicioDePrecios {
+  + factorPara(periodo: RangoDeFechas)
+  + aplicar(base: number, periodo: RangoDeFechas)
+}
+
+'  GESTORES
+class GestorVehiculo {
+  + agregar(v: Vehiculo)
+  + listar()
+  + marcarEnAlquiler(v: Vehiculo)
+  + marcarLimpieza(v: Vehiculo)
+  + actualizarKm(v: Vehiculo, km: number)
+  + filtrarPorCategoria(categoria: CategoriaVehiculo)
+}
+
+class GestorReserva {
+  - reservas: Reserva[]
+  + agregar(r: Reserva)
+  + crearPendiente(clienteId: string, fechaInicio: Date, fechaFin: Date)
+  + confirmar(reserva: Reserva, vehiculo: Vehiculo | null)
+  + cancelar(reserva: Reserva)
+  + listar()
+  + generarIdReserva()
+}
+
+class GestorAlquiler {
+  + agregar(a: Alquiler)
+  + listar()
+  + crear(reserva: Reserva, vehiculo: Vehiculo)
+  + iniciarAlquileresProgramadosDelDia(reservas: Reserva[], fechaActual: Date)
+  + finalizar(alquiler: Alquiler, kmFinal: number, _fechaActual: Date)
+}
+
+' SISTEMA 
 class SistemaAlquiler {
-  - vehiculos: List<Vehiculo>
-  - reservas: List<Reserva>
-  - alquileres: List<Alquiler>
-  + registrarVehiculo(v: Vehiculo): void
-  + buscarVehiculo(matricula: String): Vehiculo
-  + crearReserva(c: Cliente, matricula: String, r: RangoDeFechas): Reserva
-  + confirmarReserva(id: String): void
-  + iniciarAlquiler(idReserva: String, kmInicio: int): Alquiler
-  + cerrarAlquiler(idAlquiler: String, kmFin: int): Alquiler
+  + agregarVehiculo(v: Vehiculo)
+  + listarVehiculos()
+  + listarReservas()
+  + crearReservaPendiente(clienteId: string, fechaInicio: Date, fechaFin: Date)
+  + buscarVehiculoDisponible(categoria: CategoriaVehiculo, rangoPedido: RangoDeFechas): Vehiculo | null
+  + ConfirmarReserva(reserva: Reserva, categoria: CategoriaVehiculo)
+  + iniciarAlquileresDelDia(reservas: Reserva[], fechaActual: Date)
+  + finalizarAlquiler(alquiler: Alquiler, kmFinal: number, fechaActual: Date)
+  + listarAlquileres()
 }
-SistemaAlquiler o-- "*" Vehiculo
-SistemaAlquiler o-- "*" Reserva
-SistemaAlquiler o-- "*" Alquiler
-SistemaAlquiler ..> DisponibilidadService
 
-note bottom of TarifaCompacto
-  $30/día + $0.15/km excedente si kmTotales > 100·días
-end note
-note bottom of TarifaSedan
-  $50/día + $0.20/km (sin límite diario)
-end note
-note bottom of TarifaSuv
-  $80/día + $15/día seguro + $0.25/km si kmTotales > 500
-end note
+'  TARIFAS 
+class TarifaCompacto implements Tarifa
+class TarifaSedan implements Tarifa
+class TarifaSUV implements Tarifa
+
+' TEMPORADAS 
+class SelectorTemporada {
+  + obtener(fechaInicio: Date)
+}
+
+class TemporadaAlta implements Temporada
+class TemporadaBaja implements Temporada
+class TemporadaMedia implements Temporada {
+  
+}
+
+
+SistemaAlquiler *-- GestorVehiculo : gestorVehiculo
+SistemaAlquiler *-- GestorReserva : gestorReserva
+SistemaAlquiler *-- GestorAlquiler : gestorAlquiler
+GestorReserva o-- Reserva : reservas
+GestorAlquiler o-- Alquiler : alquileres
+GestorVehiculo o-- Vehiculo : vehiculos
+Vehiculo *-- FichaMantenimiento : fichaMantenimiento
+Vehiculo o-- RangoDeFechas : bloqueos
+Vehiculo o-- Tarifa
+Reserva --> Vehiculo
+Alquiler --> Reserva
+Alquiler --> Vehiculo
+EvaluadorMantenimientoPorCriterios o-- CriterioMantenimiento : criterios
+ServicioDePrecios --> Temporada
+DisponibilidadService --> Vehiculo
+GestorAlquiler --> IMantenimientoPolicy
+Alquiler ..> ServicioDePrecios
+SelectorTemporada --> Temporada
+Reserva o-- Cliente
 @enduml
