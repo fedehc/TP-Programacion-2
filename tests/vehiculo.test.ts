@@ -1,82 +1,89 @@
 import Vehiculo from "../src/vehiculo";
-import { CategoriaVehiculo, EstadoVehiculo } from "../src/enums";
 import RangoDeFechas from "../src/rangoDeFechas";
-import Tarifa from "../src/tarifa";
-
-jest.mock("../src/disponibilidadService", () => ({
-  __esModule: true,
-  default: { estaLibre: jest.fn() }
-}));
+import FichaMantenimiento from "../src/fichaMantenimiento";
 import DisponibilidadService from "../src/disponibilidadService";
+import { CategoriaVehiculo, EstadoVehiculo } from "../src/enums";
 
-describe("Tests de la clase Vehiculo", () => {
-  let v: Vehiculo;
-  let tarifa: Tarifa;
+describe("Vehiculo", () => {
+  const rango = new RangoDeFechas(new Date("2023-01-01T00:00:00"), new Date("2023-01-03T00:00:00"));
+  const tarifaMock: any = { calcularCosto: jest.fn().mockReturnValue(0) };
+  const vehiculo = new Vehiculo("ABC123", CategoriaVehiculo.compacto, EstadoVehiculo.disponible, tarifaMock, 1000);
 
-  beforeEach(() => {
-    tarifa = { getPrecioBase: () => 1000 } as any;
-    v = new Vehiculo("ABC123", CategoriaVehiculo.compacto, EstadoVehiculo.disponible, tarifa, 5000);
-    (DisponibilidadService.estaLibre as jest.Mock).mockReset();
+  afterEach(() => {
+    jest.restoreAllMocks();
+    tarifaMock.calcularCosto.mockReset && tarifaMock.calcularCosto.mockReset();
   });
 
-  it("crea un Vehiculo disponible con sus datos básicos", () => {
-    expect(v).toBeInstanceOf(Vehiculo);
-    expect(v.getMatricula()).toBe("ABC123");
-    expect(v.getCategoria()).toBe(CategoriaVehiculo.compacto);
-    expect(v.getEstado()).toBe(EstadoVehiculo.disponible);
-    expect(v.getTarifa()).toBe(tarifa);
-    expect(v.getKilometraje()).toBe(5000);
+  test("getters devuelven los valores del constructor", () => {
+    expect(vehiculo.getMatricula()).toBe("ABC123");
+    expect(vehiculo.getCategoria()).toBe(CategoriaVehiculo.compacto);
+    expect(vehiculo.getEstado()).toBe(EstadoVehiculo.disponible);
+    expect(vehiculo.getTarifa()).toBe(tarifaMock);
+    expect(vehiculo.getKilometraje()).toBe(1000);
   });
 
-  it("bloquear agrega un rango a los bloqueos", () => {
-    const r = new RangoDeFechas(new Date(2025, 0, 1), new Date(2025, 0, 5));
-    v.bloquear(r);
-    expect(v.getRangosBloqueados()).toHaveLength(1);
-    expect(v.getRangosBloqueados()[0]).toBe(r);
+  test("setEstado y setKilometraje modifican los valores", () => {
+    vehiculo.setEstado(EstadoVehiculo.mantenimiento);
+    expect(vehiculo.getEstado()).toBe(EstadoVehiculo.mantenimiento);
+
+    vehiculo.setKilometraje(12345);
+    expect(vehiculo.getKilometraje()).toBe(12345);
+
+    vehiculo.setEstado(EstadoVehiculo.disponible);
+    vehiculo.setKilometraje(1000);
   });
 
-  it("desbloquear elimina el rango exacto bloqueado (por referencia)", () => {
-    const r1 = new RangoDeFechas(new Date(2025, 0, 1), new Date(2025, 0, 5));
-    const r2 = new RangoDeFechas(new Date(2025, 1, 1), new Date(2025, 1, 5));
-    v.bloquear(r1);
-    v.bloquear(r2);
+  test("bloquear, getRangosBloqueados, desbloquear y limpiarBloqueos funcionan correctamente", () => {
+    expect(vehiculo.getRangosBloqueados()).toHaveLength(0);
 
-    v.desbloquear(r1);
-    expect(v.getRangosBloqueados()).toHaveLength(1);
-    expect(v.getRangosBloqueados()[0]).toBe(r2);
+    const r1 = new RangoDeFechas(new Date("2023-02-01T00:00:00"), new Date("2023-02-03T00:00:00"));
+    const r2 = new RangoDeFechas(new Date("2023-03-01T00:00:00"), new Date("2023-03-02T00:00:00"));
+
+    vehiculo.bloquear(r1);
+    vehiculo.bloquear(r2);
+
+    expect(vehiculo.getRangosBloqueados()).toHaveLength(2);
+    expect(vehiculo.getRangosBloqueados()).toEqual(expect.arrayContaining([r1, r2]));
+
+    const r1igual = new RangoDeFechas(new Date("2023-02-01T00:00:00"), new Date("2023-02-03T00:00:00"));
+    vehiculo.desbloquear(r1igual);
+    expect(vehiculo.getRangosBloqueados()).toHaveLength(1);
+    expect(vehiculo.getRangosBloqueados()).toEqual(expect.arrayContaining([r2]));
+
+    vehiculo.limpiarBloqueos();
+    expect(vehiculo.getRangosBloqueados()).toHaveLength(0);
   });
 
-  it("limpiarBloqueos deja el auto sin bloqueos", () => {
-    v.bloquear(new RangoDeFechas(new Date(2025, 0, 1), new Date(2025, 0, 5)));
-    v.bloquear(new RangoDeFechas(new Date(2025, 2, 1), new Date(2025, 2, 5)));
-    v.limpiarBloqueos();
-    expect(v.getRangosBloqueados()).toHaveLength(0);
+  test("estaDisponible delega en DisponibilidadService.estaLibre y pasa los argumentos correctos", () => {
+    const spy = jest.spyOn(DisponibilidadService, "estaLibre").mockReturnValue(true);
+    const r = new RangoDeFechas(new Date("2023-04-01T00:00:00"), new Date("2023-04-02T00:00:00"));
+    vehiculo.bloquear(r);
+
+    const pedido = new RangoDeFechas(new Date("2023-05-01T00:00:00"), new Date("2023-05-02T00:00:00"));
+    const resultado = vehiculo.estaDisponible(pedido);
+    expect(resultado).toBe(true);
+    expect(spy).toHaveBeenCalledWith(pedido, vehiculo.getRangosBloqueados());
+
+    vehiculo.limpiarBloqueos();
   });
 
-  it("estaDisponible consulta al service y respeta su respuesta (false)", () => {
-    const pedido = new RangoDeFechas(new Date(2025, 0, 10), new Date(2025, 0, 12));
-    (DisponibilidadService.estaLibre as jest.Mock).mockReturnValue(false);
+  test("getFichaMantenimiento inicializa y notificarAlquilerCompletado delega correctamente", () => {
+    const ficha = vehiculo.getFichaMantenimiento();
+    expect(ficha).toBeInstanceOf(FichaMantenimiento);
+    expect(ficha.getAlquileresDesdeUltimo()).toBe(0);
 
-    const disponible = v.estaDisponible(pedido);
-
-    expect(DisponibilidadService.estaLibre).toHaveBeenCalledWith(pedido, v.getRangosBloqueados());
-    expect(disponible).toBe(false);
+    vehiculo.notificarAlquilerCompletado();
+    expect(ficha.getAlquileresDesdeUltimo()).toBe(1);
   });
 
-  it("estaDisponible consulta al service y respeta su respuesta (true)", () => {
-    const pedido = new RangoDeFechas(new Date(2025, 3, 10), new Date(2025, 3, 12));
-    (DisponibilidadService.estaLibre as jest.Mock).mockReturnValue(true);
+  test("marcarEnMantenimiento, marcarLimpieza y marcarDisponible cambian el estado", () => {
+    vehiculo.marcarEnMantenimiento();
+    expect(vehiculo.getEstado()).toBe(EstadoVehiculo.mantenimiento);
 
-    const disponible = v.estaDisponible(pedido);
+    vehiculo.marcarLimpieza();
+    expect(vehiculo.getEstado()).toBe(EstadoVehiculo.limpieza);
 
-    expect(DisponibilidadService.estaLibre).toHaveBeenCalledWith(pedido, v.getRangosBloqueados());
-    expect(disponible).toBe(true);
-  });
-
-  it("cambia estado y kilometraje (setters simples)", () => {
-    v.setEstado(EstadoVehiculo.mantenimiento);
-    v.setKilometraje(5050);
-    expect(v.getEstado()).toBe(EstadoVehiculo.mantenimiento);
-    expect(v.getKilometraje()).toBe(5050);
+    vehiculo.marcarDisponible();
+    expect(vehiculo.getEstado()).toBe(EstadoVehiculo.disponible);
   });
 });

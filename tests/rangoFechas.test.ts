@@ -13,19 +13,6 @@ describe("RangoDeFechas", () => {
     expect(rango.diasDeDiferencia()).toBe(2);
   });
 
-  test("seCruzaCon debe ser true para rangos que se solapan", () => {
-    const a = new RangoDeFechas("2023-01-01", "2023-01-04");
-    const b = new RangoDeFechas("2023-01-03", "2023-01-05");
-    expect(a.seCruzaCon(b)).toBe(true);
-    expect(b.seCruzaCon(a)).toBe(true);
-  });
-
-  test("seCruzaCon debe ser false para rangos contiguos sin solapamiento", () => {
-    const a = new RangoDeFechas("2023-01-01", "2023-01-02");
-    const b = new RangoDeFechas("2023-01-02", "2023-01-03");
-    expect(a.seCruzaCon(b)).toBe(false);
-    expect(b.seCruzaCon(a)).toBe(false);
-  });
 
   test("esIgualA debe detectar rangos idénticos", () => {
     const a = new RangoDeFechas("2023-01-01", "2023-01-03");
