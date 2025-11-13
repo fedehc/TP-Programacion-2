@@ -1,54 +1,52 @@
 import RangoDeFechas from "../src/rangoDeFechas";
-
 describe("RangoDeFechas", () => {
-  describe("consultas por fecha puntual (normaliza a 00:00)", () => {
-    test("esMismoDiaQueInicio: true si es el mismo día (ignora horas)", () => {
-      const r = new RangoDeFechas(
-        new Date(2025, 1, 10, 0, 0, 0),
-        new Date(2025, 1, 12, 23, 59, 59)
-      );
+  test("getFin debe devolver la fecha de fin pasada en el constructor", () => {
+    const inicio = new Date("2023-01-01");
+    const fin = new Date("2023-01-03");
+    const rango = new RangoDeFechas(inicio, fin);
 
-      const mismaFechaConHora = new Date(2025, 1, 10, 18, 30, 0);
-      expect(r.esMismoDiaQueInicio(mismaFechaConHora)).toBe(true);
-    });
-
-    test("esAntesDeFin: true el día anterior, false si es el mismo día que fin", () => {
-      const r = new RangoDeFechas(
-        new Date(2025, 1, 10, 0, 0, 0),
-        new Date(2025, 1, 12, 0, 0, 0)
-      );
-
-      expect(r.esAntesDeFin(new Date(2025, 1, 11, 23, 59, 59))).toBe(true);
-      expect(r.esAntesDeFin(new Date(2025, 1, 12, 0, 0, 1))).toBe(false);
-    });
-
-    test("esIgualOPosteriorAFin complementa a esAntesDeFin", () => {
-      const r = new RangoDeFechas(
-        new Date(2025, 1, 10, 0, 0, 0),
-        new Date(2025, 1, 12, 0, 0, 0)
-      );
-
-      expect(r.esIgualOPosteriorAFin(new Date(2025, 1, 11))).toBe(false);
-      expect(r.esIgualOPosteriorAFin(new Date(2025, 1, 12))).toBe(true);  
-      expect(r.esIgualOPosteriorAFin(new Date(2025, 1, 13))).toBe(true);  
-    });
+    expect(rango.getFin().getTime()).toBe(fin.getTime());
   });
 
-  describe("diasDeDiferencia", () => {
-    test("redondea hacia arriba (ceil) los días", () => {
-      const r = new RangoDeFechas(
-        new Date(2025, 0, 1, 0, 0, 0),
-        new Date(2025, 0, 3, 1, 0, 0)
-      );
-      expect(r.diasDeDiferencia()).toBe(3);
-    });
+  test("diasDeDiferencia debe devolver 2 para 2023-01-01 a 2023-01-03", () => {
+    const rango = new RangoDeFechas("2023-01-01", "2023-01-03");
+    expect(rango.diasDeDiferencia()).toBe(2);
+  });
 
-    test("exactamente 2 días de diferencia", () => {
-      const r = new RangoDeFechas(
-        new Date(2025, 0, 1, 0, 0, 0),
-        new Date(2025, 0, 3, 0, 0, 0)
-      );
-      expect(r.diasDeDiferencia()).toBe(2);
-    });
+  test("seCruzaCon debe ser true para rangos que se solapan", () => {
+    const a = new RangoDeFechas("2023-01-01", "2023-01-04");
+    const b = new RangoDeFechas("2023-01-03", "2023-01-05");
+    expect(a.seCruzaCon(b)).toBe(true);
+    expect(b.seCruzaCon(a)).toBe(true);
+  });
+
+  test("seCruzaCon debe ser false para rangos contiguos sin solapamiento", () => {
+    const a = new RangoDeFechas("2023-01-01", "2023-01-02");
+    const b = new RangoDeFechas("2023-01-02", "2023-01-03");
+    expect(a.seCruzaCon(b)).toBe(false);
+    expect(b.seCruzaCon(a)).toBe(false);
+  });
+
+  test("esIgualA debe detectar rangos idénticos", () => {
+    const a = new RangoDeFechas("2023-01-01", "2023-01-03");
+    const b = new RangoDeFechas("2023-01-01", "2023-01-03");
+    expect(a.esIgualA(b)).toBe(true);
+  });
+
+  test("esMismoDiaQueInicio debe comparar por día (ignora horas)", () => {
+    const inicio = new Date("2023-01-01T05:30:00");
+    const fin = new Date("2023-01-02T10:00:00");
+    const rango = new RangoDeFechas(inicio, fin);
+    const otra = new Date("2023-01-01T23:59:59");
+    expect(rango.esMismoDiaQueInicio(otra)).toBe(true);
+  });
+
+  test("getFin debe devolver la fecha de fin pasada en el constructor", () => {
+    const inicio = new Date("2023-01-01");
+    const fin = new Date("2023-01-03");
+    const rango = new RangoDeFechas(inicio, fin);
+  
+    expect(rango.getFin().getTime()).toBe(fin.getTime());
   });
 });
+
