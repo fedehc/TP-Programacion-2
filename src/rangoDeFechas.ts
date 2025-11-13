@@ -16,7 +16,7 @@ export default class RangoDeFechas {
   }
 
   public getFin():Date{
-    return this.inicio;
+    return this.fin;
   }
   
   private normalizarFecha(fecha: Date): Date {
@@ -31,14 +31,6 @@ export default class RangoDeFechas {
 
   public esMismoDiaQueInicio(fecha: Date): boolean {
     return this.normalizarFecha(fecha).getTime() === this.normalizarFecha(this.inicio).getTime();
-  }
-
-  public esAntesDeFin(fecha: Date): boolean {
-    return this.normalizarFecha(fecha).getTime() < this.normalizarFecha(this.fin).getTime();
-  }
-
-  public esIgualOPosteriorAFin(fecha: Date): boolean {
-    return !this.esAntesDeFin(fecha);
   }
 
   public diasDeDiferencia(): number {
