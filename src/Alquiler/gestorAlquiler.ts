@@ -1,8 +1,9 @@
 import Alquiler from "./alquiler";
-import { EstadoVehiculo } from "./enums";
-import { IMantenimientoPolicy } from "./IPoliticaMantenimiento";
-import Reserva from "./reserva";
-import Vehiculo from "./vehiculo";
+import { EstadoVehiculo } from "../Extras/enums";
+import { IMantenimientoPolicy } from "../Mantenimiento/IPoliticaMantenimiento";
+import Reserva from "../Reserva/reserva";
+import Vehiculo from "../Vehiculo/vehiculo";
+
 
 export default class GestorAlquiler {
   constructor(

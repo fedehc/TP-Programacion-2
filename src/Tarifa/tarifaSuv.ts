@@ -1,6 +1,5 @@
 import Tarifa from "./tarifa";
 
-
 export default class TarifaSUV implements Tarifa {
   constructor(
     private baseDia = 80,

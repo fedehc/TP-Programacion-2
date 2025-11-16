@@ -1,6 +1,5 @@
 import Tarifa from "./tarifa";
 
-
 export default class TarifaCompacto implements Tarifa {
   constructor(
     private baseDia = 30,

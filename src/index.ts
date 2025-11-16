@@ -1,14 +1,15 @@
-import CriterioPorAlquileres from "./criterioPorAlquileres";
-import CriterioPorKilometraje from "./criterioPorKM";
-import CriterioPorMeses from "./criterioPorMeses";
-import { CategoriaVehiculo, EstadoVehiculo } from "./enums";
-import EvaluadorMantenimientoPorCriterios from "./evaluadorMantenimiento";
-import GestorAlquiler from "./gestorAlquiler";
-import GestorReserva from "./gestorReserva";
-import GestorVehiculo from "./gestorVehiculo";
+import CriterioPorAlquileres from "./Mantenimiento/criterioPorAlquileres";
+import CriterioPorKilometraje from "./Mantenimiento/criterioPorKM";
+import CriterioPorMeses from "./Mantenimiento/criterioPorMeses";
+import { CategoriaVehiculo, EstadoVehiculo } from "./Extras/enums";
+import EvaluadorMantenimientoPorCriterios from "./Mantenimiento/evaluadorMantenimiento";
+import GestorAlquiler from "./Alquiler/gestorAlquiler";
+import GestorReserva from "./Reserva/gestorReserva";
+import GestorVehiculo from "./Vehiculo/gestorVehiculo";
 import SistemaAlquiler from "./sistemaAlquiler";
-import TarifaCompacto from "./tarifaCompacto";
-import Vehiculo from "./vehiculo";
+import TarifaCompacto from "./Tarifa/tarifaCompacto";
+import Vehiculo from "./Vehiculo/vehiculo";
+
 
 (function main() {
   const criterios = [

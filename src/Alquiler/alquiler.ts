@@ -1,8 +1,9 @@
-import { EstadoAlquiler } from "./enums";
-import ServicioDePrecios from "./precioService";
-import RangoDeFechas from "./rangoDeFechas";
-import Reserva from "./reserva";
-import Vehiculo from "./vehiculo";
+import { EstadoAlquiler } from "../Extras/enums";
+import ServicioDePrecios from "../Extras/precioService";
+import RangoDeFechas from "../Extras/rangoDeFechas";
+import Reserva from "../Reserva/reserva";
+import Vehiculo from "../Vehiculo/vehiculo";
+
 
 
 export default class Alquiler {

@@ -1,7 +1,6 @@
 import Tarifa from "./tarifa";
 
-
-export default class TarifaSedan implements Tarifa {
+export default class TarifaSedan implements Tarifa{
   constructor(
     private baseDia = 50,
     private porKm = 0.20

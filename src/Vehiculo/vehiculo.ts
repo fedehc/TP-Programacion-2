@@ -1,8 +1,8 @@
-import DisponibilidadService from "./disponibilidadService";
-import { CategoriaVehiculo, EstadoVehiculo } from "./enums";
-import FichaMantenimiento from "./fichaMantenimiento";
-import RangoDeFechas from "./rangoDeFechas";
-import Tarifa from "./tarifa";
+import DisponibilidadService from "../Extras/disponibilidadService";
+import { CategoriaVehiculo, EstadoVehiculo } from "../Extras/enums";
+import RangoDeFechas from "../Extras/rangoDeFechas";
+import FichaMantenimiento from "../Mantenimiento/fichaMantenimiento";
+import Tarifa from "../Tarifa/tarifa";
 
 
 export default class Vehiculo {

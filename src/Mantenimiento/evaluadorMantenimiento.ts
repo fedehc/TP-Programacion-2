@@ -1,9 +1,9 @@
-import { CriterioMantenimiento } from "./criterioMantenimiento";
+import ICriterioMantenimiento  from "./ICriterioMantenimiento";
 import FichaMantenimiento from "./fichaMantenimiento";
 import { IMantenimientoPolicy } from "./IPoliticaMantenimiento";
 
 export default class EvaluadorMantenimientoPorCriterios implements IMantenimientoPolicy {
-  constructor(private readonly criterios: CriterioMantenimiento[]) {}
+  constructor(private readonly criterios: ICriterioMantenimiento[]) {}
 
   requiere(hoy: Date, kmActual: number, ficha: FichaMantenimiento): boolean {
 

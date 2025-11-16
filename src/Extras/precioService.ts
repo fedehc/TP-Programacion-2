@@ -1,7 +1,5 @@
 import RangoDeFechas from "./rangoDeFechas";
-import SelectorTemporada from "./temporadaSelector";
-
-
+import SelectorTemporada from "../Temporada/temporadaSelector";
 
 export default class ServicioDePrecios {
   public static factorPara(periodo: RangoDeFechas): number {

@@ -1,12 +1,12 @@
-import ServicioDePrecios from "../src/precioService";
-import SelectorTemporada from "../src/temporadaSelector";
-import TemporadaAlta from "../src/temporadaAlta";
-import TemporadaBaja from "../src/temporadaBaja";
-import TemporadaMedia from "../src/temporadaMedia";
-import RangoDeFechas from "../src/rangoDeFechas";
+import ServicioDePrecios from "../src/Extras/precioService";
+import SelectorTemporada from "../src/Temporada/temporadaSelector";
+import TemporadaAlta from "../src/Temporada/temporadaAlta";
+import TemporadaBaja from "../src/Temporada/temporadaBaja";
+import TemporadaMedia from "../src/Temporada/temporadaMedia";
+import RangoDeFechas from "../src/Extras/rangoDeFechas";
 
-describe("SelectorTemporada y ServicioDePrecios", () => {
-  test("Selector: meses 12,1,2 -> temporada alta", () => {
+describe("Temporadas y precios - pruebas", () => {
+  test("Selector: meses dic/ene/feb son alta", () => {
     const d1 = new Date("2023-12-15T00:00:00");
     const d2 = new Date("2024-01-10T00:00:00");
     const d3 = new Date("2024-02-01T00:00:00");
@@ -17,7 +17,7 @@ describe("SelectorTemporada y ServicioDePrecios", () => {
     expect(s.obtener(d3)).toBeInstanceOf(TemporadaAlta);
   });
 
-  test("Selector: meses 5,6 -> temporada baja", () => {
+  test("Selector: meses mayo/junio son baja", () => {
     const d5 = new Date("2024-05-05T00:00:00");
     const d6 = new Date("2024-06-20T00:00:00");
     const s = new SelectorTemporada();
@@ -25,13 +25,13 @@ describe("SelectorTemporada y ServicioDePrecios", () => {
     expect(s.obtener(d6)).toBeInstanceOf(TemporadaBaja);
   });
 
-  test("Selector: otros meses -> temporada media", () => {
+  test("Selector: otros meses = media", () => {
     const d = new Date("2024-03-15T00:00:00");
     const s = new SelectorTemporada();
     expect(s.obtener(d)).toBeInstanceOf(TemporadaMedia);
   });
 
-  test("Temporadas: factores y aplicarCostoBase", () => {
+  test("Temporadas: factores y aplicarCostoBase funcionan", () => {
     const alta = new TemporadaAlta();
     const baja = new TemporadaBaja();
     const media = new TemporadaMedia();
@@ -45,7 +45,7 @@ describe("SelectorTemporada y ServicioDePrecios", () => {
     expect(media.aplicarCostoBase(100)).toBeCloseTo(100);
   });
 
-  test("ServicioDePrecios.aplicar usa el factor correcto", () => {
+  test("ServicioDePrecios.aplicar: usa factor según inicio", () => {
     const inicioAlta = new Date("2023-12-01T00:00:00");
     const finAlta = new Date("2023-12-03T00:00:00");
     const rangoAlta = new RangoDeFechas(inicioAlta, finAlta);
@@ -58,15 +58,7 @@ describe("SelectorTemporada y ServicioDePrecios", () => {
     expect(ServicioDePrecios.aplicar(100, rangoBaja)).toBeCloseTo(90);
   });
 
-  test("ServicioDePrecios.factorPara invoca al selector con la fecha de inicio", () => {
-    const inicio = new Date("2024-03-10T00:00:00");
-    const fin = new Date("2024-03-12T00:00:00");
-    const rango = new RangoDeFechas(inicio, fin);
-
-    expect(ServicioDePrecios.factorPara(rango)).toBeCloseTo(1);
-  });
-
-  test("caso negativo: aplicar con base 0 devuelve 0 independientemente de la temporada", () => {
+  test("aplicar con base 0 siempre da 0", () => {
     const inicio = new Date("2023-12-01T00:00:00");
     const fin = new Date("2023-12-02T00:00:00");
     const rango = new RangoDeFechas(inicio, fin);

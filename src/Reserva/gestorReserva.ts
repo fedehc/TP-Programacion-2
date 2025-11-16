@@ -1,7 +1,8 @@
-import { EstadoReserva } from "./enums";
-import RangoDeFechas from "./rangoDeFechas";
+import { EstadoReserva } from "../Extras/enums";
+import RangoDeFechas from "../Extras/rangoDeFechas";
+import Vehiculo from "../Vehiculo/vehiculo";
 import Reserva from "./reserva";
-import Vehiculo from "./vehiculo";
+
 
 export default class GestorReserva {
   private reservas: Reserva[] = [];
@@ -35,7 +36,9 @@ export default class GestorReserva {
     reserva.cancelar();
   }
 
-  public listar(): Reserva[] { return this.reservas; }
+  public listar(): Reserva[] {
+    return this.reservas;
+  }
 
   private generarIdReserva(): string {
     return "R-" + Date.now();

@@ -1,6 +1,5 @@
 import FichaMantenimiento from "./fichaMantenimiento";
 
-
-export interface CriterioMantenimiento {
+export default interface ICriterioMantenimiento {
   cumple(hoy: Date, kmActual: number, ficha: FichaMantenimiento): boolean;
 }

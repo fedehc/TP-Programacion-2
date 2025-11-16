@@ -1,6 +1,7 @@
-import { EstadoReserva } from "./enums";
-import RangoDeFechas from "./rangoDeFechas";
-import Vehiculo from "./vehiculo";
+import { EstadoReserva } from "../Extras/enums";
+import RangoDeFechas from "../Extras/rangoDeFechas";
+import Vehiculo from "../Vehiculo/vehiculo";
+
 
 
 export default class Reserva {

@@ -25,6 +25,10 @@ export default class RangoDeFechas {
     return nuevaFecha;
   }
 
+   public seSuperponeConOtraFecha(otro: RangoDeFechas): boolean {
+    return this.getInicio() < otro.getFin() && otro.getInicio() < this.getFin();
+  }
+
   public esMismoDiaQueInicio(fecha: Date): boolean {
     return this.normalizarFecha(fecha).getTime() === this.normalizarFecha(this.inicio).getTime();
   }

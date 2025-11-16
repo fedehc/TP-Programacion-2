@@ -1,13 +1,11 @@
-import Alquiler from "./alquiler";
-import DisponibilidadService from "./disponibilidadService";
-import { CategoriaVehiculo } from "./enums";
-import GestorAlquiler from "./gestorAlquiler";
-import GestorReserva from "./gestorReserva";
-import GestorVehiculo from "./gestorVehiculo";
-import RangoDeFechas from "./rangoDeFechas";
-import Reserva from "./reserva";
-import Vehiculo from "./vehiculo";
-
+import Alquiler from "./Alquiler/alquiler";
+import GestorAlquiler from "./Alquiler/gestorAlquiler";
+import { CategoriaVehiculo } from "./Extras/enums";
+import RangoDeFechas from "./Extras/rangoDeFechas";
+import GestorReserva from "./Reserva/gestorReserva";
+import Reserva from "./Reserva/reserva";
+import GestorVehiculo from "./Vehiculo/gestorVehiculo";
+import Vehiculo from "./Vehiculo/vehiculo";
 
 export default class SistemaAlquiler {
   constructor(

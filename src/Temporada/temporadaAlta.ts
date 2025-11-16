@@ -1,5 +1,6 @@
 import Temporada from "./temporada";
 
+
 export default class TemporadaAlta implements Temporada {
     public obtenerFactor(): number {
         return 1.20;

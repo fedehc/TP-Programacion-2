@@ -1,6 +1,6 @@
-import RangoDeFechas from "../src/rangoDeFechas";
-describe("RangoDeFechas", () => {
-  test("getFin debe devolver la fecha de fin pasada en el constructor", () => {
+import RangoDeFechas from "../src/Extras/rangoDeFechas";
+describe("RangoDeFechas - pruebas", () => {
+  test("getFin: devuelve la fecha final", () => {
     const inicio = new Date("2023-01-01");
     const fin = new Date("2023-01-03");
     const rango = new RangoDeFechas(inicio, fin);
@@ -8,32 +8,31 @@ describe("RangoDeFechas", () => {
     expect(rango.getFin().getTime()).toBe(fin.getTime());
   });
 
-  test("diasDeDiferencia debe devolver 2 para 2023-01-01 a 2023-01-03", () => {
-    const rango = new RangoDeFechas("2023-01-01", "2023-01-03");
-    expect(rango.diasDeDiferencia()).toBe(2);
+  test("diasDeDiferencia: 1 al 3 enero -> 2 días", () => {
+    const rangoDosDias = new RangoDeFechas("2023-01-01", "2023-01-03");
+    expect(rangoDosDias.diasDeDiferencia()).toBe(2);
   });
 
 
-  test("esIgualA debe detectar rangos idénticos", () => {
-    const a = new RangoDeFechas("2023-01-01", "2023-01-03");
-    const b = new RangoDeFechas("2023-01-01", "2023-01-03");
-    expect(a.esIgualA(b)).toBe(true);
+  test("esIgualA: detecta rangos idénticos", () => {
+    const rangoA = new RangoDeFechas("2023-01-01", "2023-01-03");
+    const rangoB = new RangoDeFechas("2023-01-01", "2023-01-03");
+    expect(rangoA.esIgualA(rangoB)).toBe(true);
   });
 
-  test("esMismoDiaQueInicio debe comparar por día (ignora horas)", () => {
-    const inicio = new Date("2023-01-01T05:30:00");
-    const fin = new Date("2023-01-02T10:00:00");
-    const rango = new RangoDeFechas(inicio, fin);
-    const otra = new Date("2023-01-01T23:59:59");
-    expect(rango.esMismoDiaQueInicio(otra)).toBe(true);
+  test("esMismoDiaQueInicio: ignora horas", () => {
+    const inicioDia = new Date("2023-01-01T05:30:00");
+    const finDia = new Date("2023-01-02T10:00:00");
+    const rangoDia = new RangoDeFechas(inicioDia, finDia);
+    const otraHora = new Date("2023-01-01T23:59:59");
+    expect(rangoDia.esMismoDiaQueInicio(otraHora)).toBe(true);
   });
 
-  test("getFin debe devolver la fecha de fin pasada en el constructor", () => {
-    const inicio = new Date("2023-01-01");
-    const fin = new Date("2023-01-03");
-    const rango = new RangoDeFechas(inicio, fin);
-  
-    expect(rango.getFin().getTime()).toBe(fin.getTime());
+  test.skip("getFin: repetido para asegurarnos (mismo caso)", () => {
+    const inicioOtraVez = new Date("2023-01-01");
+    const finOtraVez = new Date("2023-01-03");
+    const rangoFin = new RangoDeFechas(inicioOtraVez, finOtraVez);
+    expect(rangoFin.getFin().getTime()).toBe(finOtraVez.getTime());
   });
 });
 
