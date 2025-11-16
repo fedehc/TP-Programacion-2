@@ -15,9 +15,14 @@ export default class FichaMantenimiento {
     this.alquileresDesdeUltimo += 1;
   }
 
-  public getFechaUltimo(): Date | undefined { return this.fechaUltimo; }
-  public getKmUltimo(): number | undefined { return this.kmUltimo; }
-  public getAlquileresDesdeUltimo(): number { return this.alquileresDesdeUltimo; }
+  public getFechaUltimo(): Date | undefined { 
+    return this.fechaUltimo; }
+
+  public getKmUltimo(): number | undefined { 
+    return this.kmUltimo; }
+
+  public getAlquileresDesdeUltimo(): number { 
+    return this.alquileresDesdeUltimo; }
 
   public getCostosTotal(): number {
     return this.costos.reduce((total, costo) => total + costo, 0);
