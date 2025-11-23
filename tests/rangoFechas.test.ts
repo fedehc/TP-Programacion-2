@@ -28,11 +28,5 @@ describe("RangoDeFechas - pruebas", () => {
     expect(rangoDia.esMismoDiaQueInicio(otraHora)).toBe(true);
   });
 
-  test.skip("getFin: repetido para asegurarnos (mismo caso)", () => {
-    const inicioOtraVez = new Date("2023-01-01");
-    const finOtraVez = new Date("2023-01-03");
-    const rangoFin = new RangoDeFechas(inicioOtraVez, finOtraVez);
-    expect(rangoFin.getFin().getTime()).toBe(finOtraVez.getTime());
-  });
 });
 

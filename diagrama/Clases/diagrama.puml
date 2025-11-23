@@ -1,0 +1,377 @@
+@startuml
+title Diagrama de Clases - Sistema de Alquiler
+
+
+
+
+package "Sistema" {
+    class SistemaAlquiler {
+        - gestorVehiculo: GestorVehiculo
+        - gestorReserva: GestorReserva
+        - gestorAlquiler: GestorAlquiler
+        + ConfirmarReservaConManejoErrores(reserva, categoria): Reserva | null
+        + agregarVehiculo(v): void
+        + listarVehiculos(): Vehiculo[]
+        + listarReservas(): Reserva[]
+        + crearReservaPendiente(clienteId, fechaInicio, fechaFin): Reserva
+        + buscarVehiculoDisponible(categoria, rangoPedido): Vehiculo | null
+        + ConfirmarReserva(reserva, categoria): Reserva
+        + iniciarAlquileresDelDia(reservas, fechaActual): Alquiler[]
+        + finalizarAlquiler(alquiler, kmFinal, fechaActual): void
+        + listarAlquileres(): Alquiler[]
+        - filtrarPorCategoria(categoria): Vehiculo[]
+        - estaOperativamenteDisponible(v): boolean
+        - seleccionarDisponible(candidatos, rango): Vehiculo | null
+    }
+}
+
+
+
+package "Gestores" {
+    class GestorAlquiler {
+        - reglaMantenimiento: IReglaMantenimiento
+        - selector: ISelectorTemporada
+        - alquileres: Alquiler[]
+        + listar(): Alquiler[]
+        + iniciarAlquileresProgramadosDelDia(reservas, fecha): Alquiler[]
+        + finalizar(alquiler, kmFinal, fecha): void
+        - iniciarAlquiler(reserva, vehiculo): Alquiler
+        - finalizarAlquilerYLiberarBloqueo(alquiler, kmFinal): void
+        - evaluarSiNecesitaMantenimiento(vehiculo, kmFinal, fecha): boolean
+        - actualizarEstadoDelVehiculo(vehiculo, kmFinal, necesita, fecha): void
+    }
+    class GestorReserva {
+        - reservas: Reserva[]
+        + agregar(reserva): void
+        + crearPendiente(clienteId, inicio, fin): Reserva
+        + confirmar(reserva, vehiculo): Reserva
+        + cancelar(reserva): void
+        + listar(): Reserva[]
+        - generarIdReserva(): string
+        - confirmarConVehiculoPrivado(reserva, vehiculo): void
+        - cancelarPrivado(reserva): void
+    }
+    class GestorVehiculo {
+        - vehiculos: Vehiculo[]
+        + agregar(v): void
+        + listar(): Vehiculo[]
+        + actualizarKm(v, km): void
+        + liberarDeMantenimiento(vehiculo, kmActual, costoMantenimiento, fechaActual): void
+        + filtrarPorCategoria(categoria): Vehiculo[]
+    }
+}
+
+' ESTADÍSTICAS 
+package "Estadisticas" {
+    class GestorEstadisticas {
+        - calculadorVehiculos: ICalculadorVehiculos
+        - calculadorRentabilidad: ICalculadorRentabilidad
+        - calculadorOcupacion: ICalculadorOcupacion
+        + obtenerVehiculoMasAlquilado(alquileres, periodo): {matricula, cantidad}
+        + obtenerVehiculoMenosAlquilado(alquileres, periodo): {matricula, cantidad}
+        + obtenerVehiculoMasRentable(alquileres, vehiculos, periodo): {matricula, monto}
+        + obtenerVehiculoMenosRentable(alquileres, vehiculos, periodo): {matricula, monto}
+        + obtenerOcupacionFlota(vehiculos): {porcentaje, enAlquiler, total}
+
+    }
+    interface ICalculadorVehiculos {
+        + calcular(alquileres, periodo): void
+        + obtenerMasAlquilado(): {matricula, cantidad}
+        + obtenerMenosAlquilado(): {matricula, cantidad}
+    }
+    class CalculadorVehiculos {
+        - masMatricula: string
+        - masCantidad: number
+        - menosMatricula: string
+        - menosCantidad: number
+        - filtrarAlquileres(alquileres, periodo): Alquiler[]
+        - contarPorMatricula(alquileres): Map
+        - buscarMasAlquilado(conteo): void
+        - buscarMenosAlquilado(conteo): void
+        - guardarResultados(conteo): void
+        + calcular(alquileres, periodo): void
+        + obtenerMasAlquilado(): {matricula, cantidad}
+        + obtenerMenosAlquilado(): {matricula, cantidad}
+    }
+    interface ICalculadorRentabilidad {
+        + calcular(alquileres, vehiculos, periodo): void
+        + obtenerMasRentable(): {matricula, monto}
+        + obtenerMenosRentable(): {matricula, monto}
+    }
+    class CalculadorRentabilidad {
+        - mejorMatricula: string
+        - mejorMonto: number
+        - peorMatricula: string
+        - peorMonto: number
+        - filtrarAlquileres(alquileres, periodo): Alquiler[]
+        - calcularIngresos(alquileres): Map
+        - obtenerCostos(vehiculos): Map
+        - obtenerTodasMatriculas(ingresos, costos): string[]
+        - calcularRentabilidadPorMatricula(matricula, ingresos, costos): number
+        - calcularRentabilidad(ingresos, costos): Map
+        - buscarMasRentable(rentabilidad): void
+        - buscarMenosRentable(rentabilidad): void
+        - guardarResultados(rentabilidad): void
+        + calcular(alquileres, vehiculos, periodo): void
+        + obtenerMasRentable(): {matricula, monto}
+        + obtenerMenosRentable(): {matricula, monto}
+    }
+    interface ICalculadorOcupacion {
+        + calcular(vehiculos): void
+        + obtenerOcupacion(): {porcentaje, detalle}
+    }
+    class CalculadorOcupacion {
+        - porcentaje: number
+        - enAlquiler: number
+        - total: number
+        - contarEnAlquiler(vehiculos): number
+        - calcularPorcentaje(enAlquiler, total): number
+        + calcular(vehiculos): void
+        + obtenerOcupacion(): {porcentaje, enAlquiler, total}
+    }
+}
+
+GestorEstadisticas --> ICalculadorVehiculos
+GestorEstadisticas --> ICalculadorRentabilidad
+GestorEstadisticas --> ICalculadorOcupacion
+ICalculadorVehiculos <|.. CalculadorVehiculos
+ICalculadorRentabilidad <|.. CalculadorRentabilidad
+ICalculadorOcupacion <|.. CalculadorOcupacion
+
+package "Entidades" {
+    class Alquiler {
+        - id: string
+        - reserva: Reserva
+        - vehiculo: Vehiculo
+        - clienteId: string
+        - rango: RangoDeFechas
+        - kilometrajeInicial: number
+        - selector: ISelectorTemporada
+        - estado: EstadoAlquiler
+        - kilometrajeFinal: number
+        - costoTotal: number
+        + validarFinalizacion(kmFinal): void
+        + getKmRecorridos(): number
+        + calcularCostoTotal(): number
+        + finalizar(kmFinal): void
+    }
+    class Reserva {
+        - id: string
+        - clienteId: string
+        - rango: RangoDeFechas
+        - estado: EstadoReserva
+        - vehiculo: Vehiculo
+        + marcarCumplida(): void
+        + confirmarConVehiculo(v): void
+        + cancelar(): void
+        + puedeIniciarAlquiler(): boolean
+    }
+    class Vehiculo {
+        - bloqueos: RangoDeFechas[]
+        - fichaMantenimiento: FichaMantenimiento
+        - estadoState: EstadoVehiculoState
+        - requiereMantenimiento: boolean
+        - bloqueoMantenimiento: RangoDeFechas
+        - matricula: string
+        - categoria: CategoriaVehiculo
+        - tarifa: Tarifa
+        - kilometraje: number
+        + cambiarEstado(nuevoEstado): void
+        + registrarMantenimiento(fechaActual, kmActual, costo): void
+        + registrarFinalizacion(kmFinal, requiereMantenimiento, fechaActual): void
+        + setKilometraje(nuevoKilometraje): void
+        + bloquear(rango): void
+        + desbloquear(rango): void
+        + limpiarBloqueos(): void
+        + estaDisponible(periodo): boolean
+        + notificarAlquilerCompletado(): void
+    }
+    class FichaMantenimiento {
+        - fechaUltimo: Date
+        - kmUltimo: number
+        - alquileresDesdeUltimo: number
+        - costos: number[]
+        + registrarMantenimiento(hoy, kmActual, costo): void
+        + registrarAlquilerCompletado(): void
+        + getFechaUltimo(): Date
+        + getKmUltimo(): number
+        + getAlquileresDesdeUltimo(): number
+        + getCostosTotal(): number
+        + huboAlgunaVezMantenimiento(): boolean
+    }
+    class RangoDeFechas {
+        - inicio: Date
+        - fin: Date
+        + seSuperponeConOtraFecha(otro): boolean
+        + esMismoDiaQueInicio(fecha): boolean
+        + diasDeDiferencia(): number
+        + esIgualA(otro): boolean
+    }
+}
+
+
+package "Estados Vehículo" {
+    abstract class EstadoVehiculoState {
+        + getNombre(): string
+        + getEnumValue(): EstadoVehiculo
+        + puedeIniciarAlquiler(vehiculo): boolean
+        + puedeFinalizarAlquiler(vehiculo): boolean
+        + puedeLiberarDeMantenimiento(vehiculo): boolean
+        + iniciarAlquiler(vehiculo): void
+        + finalizarAlquiler(vehiculo): void
+        + liberarDeMantenimiento(vehiculo): void
+    }
+    class DisponibleState {
+        + getNombre(): string
+        + getEnumValue(): EstadoVehiculo
+        + puedeIniciarAlquiler(vehiculo): boolean
+        + iniciarAlquiler(vehiculo): void
+    }
+    class EnAlquilerState {
+        + getNombre(): string
+        + getEnumValue(): EstadoVehiculo
+        + puedeFinalizarAlquiler(vehiculo): boolean
+        + finalizarAlquiler(vehiculo): void
+    }
+    class EnMantenimientoState {
+        + getNombre(): string
+        + getEnumValue(): EstadoVehiculo
+        + puedeLiberarDeMantenimiento(vehiculo): boolean
+        + liberarDeMantenimiento(vehiculo): void
+    }
+}
+
+'  TARIFAS 
+package "Tarifas" {
+    interface Tarifa {
+        + calcularCosto(dias, kmRecorridos): number
+    }
+    class TarifaCompacto {
+        - baseDia: number
+        - excedenteKm: number
+        + calcularCosto(dias, kmRecorridos): number
+    }
+    class TarifaSedan {
+        - baseDia: number
+        - porKm: number
+        + calcularCosto(dias, kmRecorridos): number
+    }
+    class TarifaSUV {
+        - baseDia: number
+        - seguroDia: number
+        - excedenteKm: number
+        + calcularCosto(dias, kmRecorridos): number
+    }
+}
+
+'  TEMPORADAS 
+package "Temporadas" {
+    interface Temporada {
+        # obtenerFactor(): number
+        + aplicarCostoBase(costoBase): number
+    }
+    interface ISelectorTemporada {
+        + obtener(fecha): Temporada
+    }
+    class SelectorTemporada {
+        + obtener(fecha): Temporada
+    }
+    class TemporadaAlta {
+        + aplicarCostoBase(costoBase): number
+    }
+    class TemporadaMedia {
+        + aplicarCostoBase(costoBase): number
+    }
+    class TemporadaBaja {
+        + aplicarCostoBase(costoBase): number
+    }
+}
+
+'  MANTENIMIENTO 
+package "Mantenimiento" {
+    interface IReglaMantenimiento  {
+        + requiere(fecha, km, ficha): boolean
+    }
+    interface ICriterioMantenimiento {
+        + cumple(fecha, km, ficha): boolean
+    }
+    class EvaluadorMantenimientoPorCriterios {
+        - criterios: ICriterioMantenimiento[]
+        + requiere(fecha, km, ficha): boolean
+    }
+    class CriterioPorKM {
+        - umbralKm: number
+        + cumple(fecha, km, ficha): boolean
+    }
+    class CriterioPorMeses {
+        - umbralMeses: number
+        - diffMeses(desde, hasta): number
+        + cumple(fecha, km, ficha): boolean
+    }
+    class CriterioPorAlquileres {
+        - umbralAlquileres: number
+        + cumple(hoy, kmActual, ficha): boolean
+        + cumple(fecha, km, ficha): boolean
+    }
+}
+
+'  SERVICIOS 
+package "Servicios" {
+    class DisponibilidadService {
+        + estaLibre(rango, bloqueos): boolean
+    }
+}
+
+
+' RELACIONES
+
+SistemaAlquiler o-- GestorAlquiler
+SistemaAlquiler o-- GestorReserva
+SistemaAlquiler o-- GestorVehiculo
+SistemaAlquiler o-- GestorEstadisticas
+
+GestorAlquiler *-- Alquiler
+GestorAlquiler --> IReglaMantenimiento
+GestorAlquiler --> ISelectorTemporada
+GestorReserva *-- Reserva
+GestorVehiculo o-- Vehiculo
+
+Alquiler --> Reserva
+Alquiler --> Vehiculo
+Alquiler *-- RangoDeFechas
+Alquiler --> ISelectorTemporada
+Reserva *-- RangoDeFechas
+Reserva --> Vehiculo
+Vehiculo *-- EstadoVehiculoState
+Vehiculo *-- FichaMantenimiento
+Vehiculo o-- Tarifa
+Vehiculo *-- RangoDeFechas : bloqueos
+
+EstadoVehiculoState <|-- DisponibleState
+EstadoVehiculoState <|-- EnAlquilerState
+EstadoVehiculoState <|-- EnMantenimientoState
+EstadoVehiculoState <|-- NecesitaLimpiezaState
+
+Tarifa <|.. TarifaCompacto
+Tarifa <|.. TarifaSedan
+Tarifa <|.. TarifaSUV
+
+Temporada <|.. TemporadaAlta
+Temporada <|.. TemporadaMedia
+Temporada <|.. TemporadaBaja
+ISelectorTemporada <|.. SelectorTemporada
+SelectorTemporada --> Temporada
+
+IReglaMantenimiento <|.. EvaluadorMantenimientoPorCriterios
+ICriterioMantenimiento <|.. CriterioPorKM
+ICriterioMantenimiento <|.. CriterioPorMeses
+ICriterioMantenimiento <|.. CriterioPorAlquileres
+EvaluadorMantenimientoPorCriterios *-- ICriterioMantenimiento
+ICriterioMantenimiento ..> FichaMantenimiento
+
+Vehiculo ..> DisponibilidadService
+DisponibilidadService ..> RangoDeFechas
+
+
+
+@enduml

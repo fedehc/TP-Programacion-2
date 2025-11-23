@@ -1,0 +1,97 @@
+@startuml
+title Finalización de Alquiler con Evaluación Automática de Mantenimiento
+
+actor Cliente
+participant "sistema:\nSistemaAlquiler" as Sistema
+participant "gestor:\nGestorAlquiler" as Gestor
+participant "alquiler:\nAlquiler" as Alquiler
+participant "vehiculo:\nVehiculo" as Vehiculo
+participant "evaluador:\nEvaluadorMantenimiento" as Evaluador
+participant "criterioKM:\nCriterioPorKM" as CriterioKM
+participant "criterioMeses:\nCriterioPorMeses" as CriterioMeses
+participant "criterioAlquileres:\nCriterioPorAlquileres" as CriterioAlq
+participant "ficha:\nFichaMantenimiento" as Ficha
+participant "estado:\nEnAlquilerState" as Estado
+participant "selector:\nSelectorTemporada" as Selector
+participant "temporada:\nTemporada" as Temporada
+
+Cliente -> Sistema: finalizarAlquiler(alquiler, 15500)
+activate Sistema
+
+Sistema -> Gestor: finalizar(alquiler, 15500, fechaActual)
+activate Gestor
+
+== Finalizar Alquiler y Calcular Costo ==
+Gestor -> Alquiler: finalizar(15500)
+activate Alquiler
+Alquiler -> Alquiler: validarFinalizacion(15500)
+note right: Valida estado activo\ny km válido
+Alquiler -> Alquiler: calcularCostoTotal()
+Alquiler -> Selector: obtener(fechaInicio)
+activate Selector
+Selector --> Alquiler: temporadaAlta
+deactivate Selector
+Alquiler -> Temporada: aplicarCostoBase(costoBase)
+activate Temporada
+Temporada --> Alquiler: costoFinal (x1.20)
+deactivate Temporada
+Alquiler -> Alquiler: estado = finalizado
+deactivate Alquiler
+
+Gestor -> Vehiculo: desbloquear(rango)
+activate Vehiculo
+Vehiculo -> Vehiculo: bloqueos.remove(rango)
+deactivate Vehiculo
+
+== Evaluar Necesidad de Mantenimiento ==
+Gestor -> Evaluador: requiere(fechaActual, 15500, ficha)
+activate Evaluador
+
+Evaluador -> CriterioKM: cumple(fechaActual, 15500, ficha)
+activate CriterioKM
+CriterioKM -> Ficha: getKmUltimo()
+Ficha --> CriterioKM: 5000
+CriterioKM --> Evaluador: true (15500 - 5000 >= 10000)
+deactivate CriterioKM
+
+
+Evaluador --> Gestor: true (requiere mantenimiento)
+deactivate Evaluador
+
+== Actualizar Estado del Vehículo ==
+Gestor -> Estado: puedeFinalizarAlquiler(vehiculo)
+activate Estado
+Estado --> Gestor: true
+deactivate Estado
+
+Gestor -> Vehiculo: registrarFinalizacion(15500, true, fechaActual)
+activate Vehiculo
+
+Vehiculo -> Vehiculo: actualizarKilometrajeYEstado(15500, true)
+Vehiculo -> Ficha: registrarAlquilerCompletado()
+activate Ficha
+Ficha -> Ficha: alquileresDesdeUltimo++
+deactivate Ficha
+
+Vehiculo -> Vehiculo: bloquearVehiculoPorMantenimiento(fechaActual)
+note right: Crea bloqueo de 1 día\npara mantenimiento
+Vehiculo -> Vehiculo: bloquear(rangoDe1Dia)
+deactivate Vehiculo
+
+Gestor -> Estado: finalizarAlquiler(vehiculo)
+activate Estado
+Estado -> Vehiculo: getRequiereMantenimiento()
+Vehiculo --> Estado: true
+Estado -> Vehiculo: cambiarEstado(new EnMantenimientoState())
+activate Vehiculo
+Vehiculo -> Vehiculo: estadoState = EnMantenimientoState
+deactivate Vehiculo
+deactivate Estado
+
+Gestor --> Sistema: (void)
+deactivate Gestor
+
+Sistema --> Cliente: Alquiler finalizado\nVehículo en mantenimiento
+deactivate Sistema
+
+@enduml

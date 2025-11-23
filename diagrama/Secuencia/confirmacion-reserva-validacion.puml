@@ -1,0 +1,76 @@
+@startuml
+title Confirmación de Reserva con Validación de Disponibilidad Anti-Overbooking
+
+actor Cliente
+participant "gestor:\nGestorReserva" as Gestor
+participant "reserva:\nReserva" as Reserva
+participant "vehiculo:\nVehiculo" as Vehiculo
+participant "servicio:\nDisponibilidadService" as Servicio
+participant "rango:\nRangoDeFechas" as Rango
+
+Cliente -> Gestor: confirmar(reserva, vehiculo)
+activate Gestor
+
+== Validar Disponibilidad ==
+Gestor -> Vehiculo: estaDisponible(rango)
+activate Vehiculo
+
+Vehiculo -> Servicio: estaLibre(rango, bloqueos)
+activate Servicio
+
+loop para cada bloqueo existente
+    Servicio -> Rango: seSuperponeConOtraFecha(bloqueo)
+    activate Rango
+    Rango --> Servicio: false
+    deactivate Rango
+end
+
+Servicio --> Vehiculo: true (sin conflictos)
+deactivate Servicio
+
+Vehiculo --> Gestor: true
+deactivate Vehiculo
+
+== Confirmar Reserva ==
+Gestor -> Reserva: confirmarConVehiculo(vehiculo)
+activate Reserva
+Reserva -> Reserva: vehiculo = vehiculo
+Reserva -> Reserva: estado = confirmada
+deactivate Reserva
+
+Gestor -> Vehiculo: bloquear(rango)
+activate Vehiculo
+Vehiculo -> Vehiculo: bloqueos.add(rango)
+deactivate Vehiculo
+
+Gestor -> Gestor: reservas.add(reserva)
+
+Gestor --> Cliente: Reserva confirmada
+deactivate Gestor
+
+== Flujo Alternativo: Vehículo No Disponible ==
+Cliente -> Gestor: confirmar(reserva2, vehiculoOcupado)
+activate Gestor
+
+Gestor -> Vehiculo: estaDisponible(rango)
+activate Vehiculo
+Vehiculo -> Servicio: estaLibre(rango, bloqueos)
+activate Servicio
+
+Servicio -> Rango: seSuperponeConOtraFecha(bloqueo)
+activate Rango
+Rango --> Servicio: true (conflicto!)
+deactivate Rango
+
+Servicio --> Vehiculo: false
+deactivate Servicio
+Vehiculo --> Gestor: false
+deactivate Vehiculo
+
+Gestor -> Gestor: throw VehiculoNoDisponibleException
+note right: Previene overbooking\nantes de confirmar
+
+Gestor --> Cliente:  Error: Vehículo no disponible
+deactivate Gestor
+
+@enduml
