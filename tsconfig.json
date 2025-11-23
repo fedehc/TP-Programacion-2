@@ -5,7 +5,7 @@
     "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "removeComments": true,
+    "removeComments": false,
     "moduleResolution": "node",
     "esModuleInterop": true,
     "strict": true,

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Reserva/gestorReserva.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Reserva/gestorReserva.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
+var __importDefault = (this &amp;&amp; this.__importDefault) || function (mod) {
+    return (mod &amp;&amp; mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const exceptions_1 = require("../Excepciones/exceptions");
+const rangoDeFechas_1 = __importDefault(require("../Extras/rangoDeFechas"));
+const reserva_1 = __importDefault(require("./reserva"));
+/**
+ * Gestor de reservas: administra la creación, confirmación, cancelación y listado de reservas.
+ *
+ * Responsabilidad principal: orquestar el ciclo de vida de una reserva y su relación con vehículos.
+ *
+ * Ejemplo de uso:
+ * ```ts
+ * const gestor = new GestorReserva();
+ * const reserva = gestor.crearPendiente("CLI-1", fechaInicio, fechaFin);
+ * gestor.confirmar(reserva, vehiculo);
+ * ```
+ */
+class GestorReserva {
+    reservas = [];
+    agregar(reserva) {
+        this.reservas.push(reserva);
+    }
+    /**
+     * Crea una reserva en estado pendiente (no la agrega al listado).
+     *
+     * @param clienteId - ID del cliente
+     * @param fechaInicio - Fecha de inicio de la reserva
+     * @param fechaFin - Fecha de fin de la reserva
+     * @returns Reserva pendiente
+     */
+    crearPendiente(clienteId, fechaInicio, fechaFin) {
+        const rango = new rangoDeFechas_1.default(fechaInicio, fechaFin);
+        const nueva = new reserva_1.default(this.generarIdReserva(), clienteId, rango);
+        return nueva;
+    }
+    /**
+     * Confirma una reserva con un vehículo disponible o la cancela si no hay vehículo.
+     *
+     * @param reserva - Reserva a confirmar
+     * @param vehiculo - Vehículo asignado o null
+     * @returns Reserva confirmada o cancelada
+     */
+    confirmar(reserva, vehiculo) {
+        if (vehiculo) {
+            this.confirmarConVehiculo(reserva, vehiculo);
+        }
+        else {
+            this.cancelarReserva(reserva);
+        }
+        return reserva;
+    }
+    /**
+     * Cancela una reserva y libera el vehículo si corresponde.
+     *
+     * @param reserva - Reserva a cancelar
+     */
+    cancelar(reserva) {
+        const vehiculo = reserva.getVehiculo();
+        if (vehiculo) {
+            vehiculo.desbloquear(reserva.getRango());
+        }
+        reserva.cancelar();
+    }
+    /**
+     * Devuelve el listado de reservas gestionadas.
+     *
+     * @returns Reservas
+     */
+    listar() {
+        return this.reservas;
+    }
+    /**
+     * Genera un identificador único para una reserva.
+     *
+     * @returns ID de reserva
+     */
+    generarIdReserva() {
+        return "R-" + Date.now();
+    }
+    /**
+     * Confirma la reserva asociando y bloqueando el vehículo, y agrega la reserva al listado.
+     *
+     * @param reserva - Reserva a confirmar
+     * @param vehiculo - Vehículo a asociar
+     * @throws VehiculoNoDisponibleException si el vehículo no está disponible
+     */
+    confirmarConVehiculo(reserva, vehiculo) {
+        if (!vehiculo.estaDisponible(reserva.getRango())) {
+            throw new exceptions_1.VehiculoNoDisponibleException();
+        }
+        reserva.confirmarConVehiculo(vehiculo);
+        vehiculo.bloquear(reserva.getRango());
+        this.reservas.push(reserva);
+    }
+    cancelarReserva(reserva) {
+        reserva.cancelar();
+    }
+}
+exports.default = GestorReserva;
+//# sourceMappingURL=gestorReserva.js.map</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CalculadorOcupacion.html">CalculadorOcupacion</a></li><li><a href="CalculadorRentabilidad.html">CalculadorRentabilidad</a></li><li><a href="CalculadorVehiculos.html">CalculadorVehiculos</a></li><li><a href="DisponibilidadService.html">DisponibilidadService</a></li><li><a href="DisponibleState.html">DisponibleState</a></li><li><a href="EnAlquilerState.html">EnAlquilerState</a></li><li><a href="EnMantenimientoState.html">EnMantenimientoState</a></li><li><a href="EstadoVehiculoState.html">EstadoVehiculoState</a></li><li><a href="EvaluadorMantenimientoPorCriterios.html">EvaluadorMantenimientoPorCriterios</a></li><li><a href="FichaMantenimiento.html">FichaMantenimiento</a></li><li><a href="GestorReserva.html">GestorReserva</a></li><li><a href="GestorVehiculo.html">GestorVehiculo</a></li><li><a href="RangoDeFechas.html">RangoDeFechas</a></li><li><a href="SistemaAlquiler.html">SistemaAlquiler</a></li></ul><h3>Global</h3><ul><li><a href="global.html#alquilerExceptions_1">alquilerExceptions_1</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Sun Nov 23 2025 14:56:33 GMT-0300 (hora estándar de Argentina)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

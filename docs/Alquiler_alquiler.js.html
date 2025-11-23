@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Alquiler/alquiler.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Alquiler/alquiler.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * @todo Evaluar el uso del patrón Builder para la construcción de Alquiler,
+ * especialmente si se agregan más parámetros opcionales o lógica de inicialización.
+ */
+const alquilerExceptions_1 = require("../Excepciones/alquilerExceptions");
+const exceptions_1 = require("../Excepciones/exceptions");
+const enums_1 = require("../Extras/enums");
+class Alquiler {
+    id;
+    reserva;
+    vehiculo;
+    clienteId;
+    rango;
+    kilometrajeInicial;
+    selector;
+    estado;
+    kilometrajeFinal;
+    costoTotal;
+    constructor(id, reserva, vehiculo, clienteId, rango, kilometrajeInicial, selector, estado = enums_1.EstadoAlquiler.activo, kilometrajeFinal, costoTotal) {
+        this.id = id;
+        this.reserva = reserva;
+        this.vehiculo = vehiculo;
+        this.clienteId = clienteId;
+        this.rango = rango;
+        this.kilometrajeInicial = kilometrajeInicial;
+        this.selector = selector;
+        this.estado = estado;
+        this.kilometrajeFinal = kilometrajeFinal;
+        this.costoTotal = costoTotal;
+    }
+    getId() {
+        return this.id;
+    }
+    getReserva() {
+        return this.reserva;
+    }
+    getVehiculo() {
+        return this.vehiculo;
+    }
+    getClienteId() { return this.clienteId; }
+    getRango() {
+        return this.rango;
+    }
+    getKilometrajeInicial() {
+        return this.kilometrajeInicial;
+    }
+    getKilometrajeFinal() {
+        return this.kilometrajeFinal;
+    }
+    getEstado() {
+        return this.estado;
+    }
+    getCostoTotal() {
+        return this.costoTotal;
+    }
+    validarFinalizacion(kmFinal) {
+        if (this.estado !== enums_1.EstadoAlquiler.activo) {
+            throw new exceptions_1.AlquilerEstadoInvalidoException("No se puede finalizar alquiler porque el alquiler no está activo.");
+        }
+        if (kmFinal &lt; this.kilometrajeInicial) {
+            throw new alquilerExceptions_1.KilometrajeInvalidoException(this.kilometrajeInicial, kmFinal);
+        }
+    }
+    getKmRecorridos() {
+        if (this.kilometrajeFinal === undefined) {
+            throw new alquilerExceptions_1.AlquilerNoFinalizadoException("El alquiler no fue finalizado todavía.");
+        }
+        return this.kilometrajeFinal - this.kilometrajeInicial;
+    }
+    calcularCostoTotal() {
+        const dias = this.rango.diasDeDiferencia();
+        const kmRecorridos = this.getKmRecorridos();
+        const costoBase = this.vehiculo.getTarifa().calcularCosto(dias, kmRecorridos);
+        const temporada = this.selector.obtener(this.rango.getInicio());
+        const costoFinal = temporada.aplicarCostoBase(costoBase);
+        /* NOTA PARA EVOLUCIÓN FUTURA:
+         * Si se agregan descuentos, promociones o recargos adicionales, se recomienda:
+         * 1. Extraer esta lógica a una clase ServicioDePrecios o CalculadorPrecio
+         * 2. Implementar patrón Chain of Responsibility con múltiples "ajustes de precio"
+         *    (ej: AjusteTemporada, AjusteDescuentoVIP, AjustePromocion)
+         * 3. Inyectar el servicio en lugar del calendario directo
+         * Por ahora, mantener simple cumple YAGNI (You Aren't Gonna Need It).
+         */
+        return costoFinal;
+    }
+    finalizar(kmFinal) {
+        this.validarFinalizacion(kmFinal);
+        this.kilometrajeFinal = kmFinal;
+        this.costoTotal = this.calcularCostoTotal();
+        this.estado = enums_1.EstadoAlquiler.finalizado;
+    }
+}
+exports.default = Alquiler;
+//# sourceMappingURL=alquiler.js.map</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CalculadorOcupacion.html">CalculadorOcupacion</a></li><li><a href="CalculadorRentabilidad.html">CalculadorRentabilidad</a></li><li><a href="CalculadorVehiculos.html">CalculadorVehiculos</a></li><li><a href="DisponibilidadService.html">DisponibilidadService</a></li><li><a href="DisponibleState.html">DisponibleState</a></li><li><a href="EnAlquilerState.html">EnAlquilerState</a></li><li><a href="EnMantenimientoState.html">EnMantenimientoState</a></li><li><a href="EstadoVehiculoState.html">EstadoVehiculoState</a></li><li><a href="EvaluadorMantenimientoPorCriterios.html">EvaluadorMantenimientoPorCriterios</a></li><li><a href="FichaMantenimiento.html">FichaMantenimiento</a></li><li><a href="GestorReserva.html">GestorReserva</a></li><li><a href="GestorVehiculo.html">GestorVehiculo</a></li><li><a href="RangoDeFechas.html">RangoDeFechas</a></li><li><a href="SistemaAlquiler.html">SistemaAlquiler</a></li></ul><h3>Global</h3><ul><li><a href="global.html#alquilerExceptions_1">alquilerExceptions_1</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Sun Nov 23 2025 14:56:33 GMT-0300 (hora estándar de Argentina)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,87 +1,136 @@
-# 🧩 TP Programación 2
-## DriveHuB: Sistema de Alquiler de Autos
+# Sistema de Alquiler de Vehículos  
+## Trabajo Práctico – Programación II 
 
-![LogoTP](https://images2.imgbox.com/04/2a/PJGqWhYa_o.png)  
+Este repositorio contiene la implementación completa de un **Sistema de Alquiler de Vehículos** desarrollado en **TypeScript**, como parte del Trabajo Práctico de la materia **Programación II**.  
+El sistema abarca la gestión integral de vehículos, reservas, alquileres, mantenimiento, temporadas, tarifas y estadísticas, respetando las reglas del dominio y manteniendo un diseño modular, claro y escalable.
 
----
+## Objetivo del Proyecto
 
-## Integrantes
-- **De Marte**, Melina
-- **Perea**, Marian
-- **Cacace**, Federico
+El propósito es modelar un sistema que permita administrar todas las operaciones relacionadas con el alquiler de vehículos, desde la reserva inicial hasta la finalización del alquiler, incluyendo:
 
----
+- Control del estado de los vehículos  
+- Gestión de disponibilidad y superposición de fechas  
+- Cálculo de tarifas y ajustes por temporada  
+- Evaluación de mantenimiento  
+- Obtención de estadísticas operativas  
 
-## Introducción
-El trabajo trata sobre la creación de un sistema de gestión de una plataforma de alquiler de autos llamado **DriveHub**.
+## Estructura del Proyecto
 
-El sistema debe poder gestionar toda su flota de vehículos y todas las reservas que van realizando sus clientes y calcular los costos de alquiler.
+El código fuente se encuentra dentro de la carpeta `src/`, organizado en módulos por responsabilidad:
 
-### Objetivo General
-> *Que los alumnos/as adquieran, mediante el desarrollo del trabajo práctico, una mejor comprensión de los temas que se analizan en la materia desde una perspectiva teórica.*
+src/
+ ├── Alquiler/
+ ├── Estadistica/
+ ├── Excepciones/
+ ├── Extras/
+ ├── Mantenimiento/
+ ├── Reserva/
+ ├── Tarifa/
+ ├── Temporada/
+ └── Vehiculo/
 
-### Objetivos Particulares
-#### Principal
-*Que los alumnos/as adquieran, mediante el desarrollo del trabajo práctico, una mejor
-comprensión de los temas que se analizan en la materia desde una perspectiva teórica.*
+## Descripción de los Módulos
 
-#### Trabajo en equipo
-*Que los alumnos/as comprendan la importancia del trabajo en equipo para llevar adelante un
-proyecto. Los alumnos/as deberán conformar equipos de 5 integrantes.*
-#### Técnicas y herramientas
-*Que los alumnos/as comiencen a utilizar, o incrementen sus conocimientos sobre, técnicas y
-herramientas de desarrollo de software actualmente utilizadas en la industria.*
+### Vehículo (`src/Vehiculo/`)
 
----
-## Requerimientos Funcionales
-El sistema debe ser capaz de:
+- vehiculo.ts  
+- gestorVehiculo.ts  
+- Estados del vehículo  
+- estadoVehiculoState.ts  
 
-- ***Gestionar Vehículos**: Existen tres categorías principales: Compacto, Sedán y SUV. Cada
-vehículo tiene un número de matrícula, un estado (Disponible, En Alquiler, En
-Mantenimiento, Necesita Limpieza) y una lógica de tarifa específica.
+### Reserva (`src/Reserva/`)
 
-- **Gestión de Clientes y Reservas**: Un cliente puede crear una reserva para un vehículo
-específico, indicando la fecha de inicio y fin. El sistema debe validar la disponibilidad del
-vehículo para las fechas solicitadas.
+- reserva.ts  
+- gestorReserva.ts  
 
-- **Cálculo de Tarifas**:
-  - **Compacto**: Tarifa base de $30 por día. Aplica un cargo de $0.15 por cada kilómetro
-  recorrido si se superan los 100 km por día de alquiler.
-  - **Sedán**: Tarifa base de $50 por día. Aplica un cargo de $0.20 por cada kilómetro
-  recorrido, sin límite diario.
-  - **SUV**: Tarifa base de $80 por día. Aplica un cargo fijo adicional de $15 por día por
-  concepto de seguro y un cargo de $0.25 por cada kilómetro recorrido si se superan
-los 500km en total durante el período de alquiler.
+### Alquiler (`src/Alquiler/`)
 
-- **Gestión de Kilometraje**: cada vez que un cliente entrega el vehículo, se debe tomar nota
-del kilometraje de manera tal que se pueda calcular los cargos adicionales correspondientes.
+- alquiler.ts  
+- gestorAlquiler.ts  
 
-- **Mantenimiento de Vehículos**: El sistema debe poder registrar el costo y la fecha de los
-mantenimientos de cada vehículo.
+### Tarifas (`src/Tarifa/`)
 
----
-## Qué se pide
-1. *Diagrama de clase* de la solución propuesta.
-2. *Diagramas de sequencia* de 2 o más requerimientos a definir por el equipo.
-3. *Desarrollar una aplicación* que permita emular la situación planteada. Proveer el código y
-las pruebas unitarias para verificar:
-    1. Creación de distintos tipos de vehículos
-    2. Lógica de cálculo de tarifas y recargos en distintos escenarios.
-    3. Costo total de una reserva. Plantear distintos escenarios.
+- tarifa.ts  
+- tarifaCompacto.ts  
+- tarifaSedan.ts  
+- tarifaSuv.ts  
 
----
+### Temporadas (`src/Temporada/`)
 
-## Requerimientos adicionales:
-- Desarrollar las pruebas unitarias para cada método realizado.
-- El porcentaje de código cubierto por pruebas unitarias debe superar el 80%.
-- Agregar archivo README.md al proyecto describiendo el proyecto, agregar instrucciones para su compilación y funcionamiento.
-- Generar documentación de código utilizando JSDoc.
+- temporada.ts  
+- temporadaAlta.ts  
+- temporadaMedia.ts  
+- temporadaBaja.ts  
+- temporadaSelector.ts  
 
----
-## Diagrama de Clases
-![Diagrama de Clases](https://images2.imgbox.com/dc/33/BP7kv9vr_o.png)  
+### Mantenimiento (`src/Mantenimiento/`)
 
----
+- Criterios y reglas de mantenimiento  
+- Evaluador central  
 
-![MrBurns](https://images2.imgbox.com/06/52/zBemuqMZ_o.png)  
-**Continuará...**
+### Estadísticas (`src/Estadistica/`)
+
+- Ocupación  
+- Rentabilidad  
+- Vehículos más y menos alquilados  
+
+### Extras (`src/Extras/`)
+
+- enums.ts  
+- rangoDeFechas.ts  
+- disponibilidadService.ts  
+
+### Excepciones (`src/Excepciones/`)
+
+- Manejo específico de errores del dominio  
+
+## Clase Principal del Sistema
+
+### sistemaAlquiler.ts
+
+Orquestador general que integra todos los gestores y expone las operaciones principales:
+
+- Agregar vehículos  
+- Crear y confirmar reservas  
+- Generar alquileres  
+- Finalizar alquileres  
+- Consultar disponibilidad  
+- Obtener estadísticas  
+
+## Instalación y Ejecución
+
+### Requisitos
+
+- Node.js  
+- npm o yarn  
+- TypeScript configurado
+
+### Instalación
+
+npm install
+
+### Compilación
+
+npm run build
+
+### Ejecución
+
+npm start
+
+## Ejecución de Tests
+
+npm test
+
+## Funcionalidades Implementadas
+
+- Gestión completa de vehículos  
+- Control de estados  
+- Reservas con validación  
+- Alquileres con cálculo de costo  
+- Tarifas por categoría  
+- Ajustes por temporada  
+- Mantenimiento  
+- Estadísticas  
+- Excepciones robustas  
+
+

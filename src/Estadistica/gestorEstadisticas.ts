@@ -6,6 +6,10 @@ import ICalculadorRentabilidad from "./ICalculadorRentabilidad";
 import { ICalculadorVehiculos } from "./ICalculadorVehiculos";
 
 
+/**
+ * Gestiona el cálculo de estadísticas sobre los vehículos y alquileres.
+ * Utiliza diferentes calculadores para obtener información como el vehículo más/menos alquilado y la rentabilidad.
+ */
 export default class GestorEstadisticas {
   constructor(
     private calculadorVehiculos: ICalculadorVehiculos,

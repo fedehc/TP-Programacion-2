@@ -7,6 +7,10 @@ import EstadoVehiculoState from "./estadoVehiculoState";
 import DisponibleState from "./disponibleState";
 
 
+/**
+ * Representa un vehículo de la flota disponible para alquiler.
+ * Gestiona el estado, la disponibilidad, el mantenimiento y la información principal del vehículo.
+ */
 export default class Vehiculo {
   private bloqueos: RangoDeFechas[] = [];
   private fichaMantenimiento: FichaMantenimiento = new FichaMantenimiento();

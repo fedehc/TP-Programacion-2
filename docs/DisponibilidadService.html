@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Class: DisponibilidadService</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Class: DisponibilidadService</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2><span class="attribs"><span class="type-signature"></span></span>DisponibilidadService<span class="signature">()</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description">Servicio para verificar la disponibilidad de un periodo en un rango de fechas.Proporciona métodos utilitarios para comprobar si un rango está libre considerando bloqueos existentes.</div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    
+    <h4 class="name" id="DisponibilidadService"><span class="type-signature"></span>new DisponibilidadService<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Extras_disponibilidadService.js.html">Extras/disponibilidadService.js</a>, <a href="Extras_disponibilidadService.js.html#line7">line 7</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".estaLibre"><span class="type-signature">(static) </span>estaLibre<span class="signature">(rangoPedido, bloqueos)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Verifica si un rango solicitado está libre, es decir, no se superpone con ningún bloqueo.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>rangoPedido</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="RangoDeFechas.html">RangoDeFechas</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Rango de fechas solicitado.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>bloqueos</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;<a href="RangoDeFechas.html">RangoDeFechas</a>></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Lista de rangos bloqueados.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Extras_disponibilidadService.js.html">Extras/disponibilidadService.js</a>, <a href="Extras_disponibilidadService.js.html#line14">line 14</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    True si el rango está libre, false si hay superposición.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CalculadorOcupacion.html">CalculadorOcupacion</a></li><li><a href="CalculadorRentabilidad.html">CalculadorRentabilidad</a></li><li><a href="CalculadorVehiculos.html">CalculadorVehiculos</a></li><li><a href="DisponibilidadService.html">DisponibilidadService</a></li><li><a href="DisponibleState.html">DisponibleState</a></li><li><a href="EnAlquilerState.html">EnAlquilerState</a></li><li><a href="EnMantenimientoState.html">EnMantenimientoState</a></li><li><a href="EstadoVehiculoState.html">EstadoVehiculoState</a></li><li><a href="EvaluadorMantenimientoPorCriterios.html">EvaluadorMantenimientoPorCriterios</a></li><li><a href="FichaMantenimiento.html">FichaMantenimiento</a></li><li><a href="GestorReserva.html">GestorReserva</a></li><li><a href="GestorVehiculo.html">GestorVehiculo</a></li><li><a href="RangoDeFechas.html">RangoDeFechas</a></li><li><a href="SistemaAlquiler.html">SistemaAlquiler</a></li></ul><h3>Global</h3><ul><li><a href="global.html#alquilerExceptions_1">alquilerExceptions_1</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Sun Nov 23 2025 14:56:33 GMT-0300 (hora estándar de Argentina)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

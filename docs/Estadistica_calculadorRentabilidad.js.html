@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Estadistica/calculadorRentabilidad.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Estadistica/calculadorRentabilidad.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const exceptions_1 = require("../Excepciones/exceptions");
+/**
+ * Calcula la rentabilidad de cada vehículo en un período dado.
+ * Permite obtener la matrícula y monto del vehículo más y menos rentable.
+ * @implements {ICalculadorRentabilidad}
+ */
+class CalculadorRentabilidad {
+    mejorMatricula = "";
+    mejorMonto = 0;
+    peorMatricula = "";
+    peorMonto = 0;
+    /**
+     * Filtra los alquileres que se superponen con el período dado.
+     * @param {Alquiler[]} alquileres Lista de alquileres.
+     * @param {RangoDeFechas} periodo Período a considerar.
+     * @returns {Alquiler[]} Alquileres filtrados.
+     */
+    filtrarAlquileres(alquileres, periodo) {
+        const alquileresFiltrados = [];
+        for (let i = 0; i &lt; alquileres.length; i++) {
+            if (periodo.seSuperponeConOtraFecha(alquileres[i].getRango())) {
+                alquileresFiltrados.push(alquileres[i]);
+            }
+        }
+        return alquileresFiltrados;
+    }
+    /**
+     * Calcula los ingresos por matrícula de vehículo.
+     * @param {Alquiler[]} alquileres Lista de alquileres.
+     * @returns {Map&lt;string, number>} Mapa de matrícula a ingresos.
+     */
+    calcularIngresos(alquileres) {
+        const ingresos = new Map();
+        for (let i = 0; i &lt; alquileres.length; i++) {
+            const alquiler = alquileres[i];
+            if (alquiler.getCostoTotal() !== undefined) {
+                const matricula = alquiler.getVehiculo().getMatricula();
+                const costoActual = ingresos.get(matricula) || 0;
+                ingresos.set(matricula, costoActual + alquiler.getCostoTotal());
+            }
+        }
+        return ingresos;
+    }
+    /**
+     * Obtiene los costos de mantenimiento por matrícula de vehículo.
+     * @param {Vehiculo[]} vehiculos Lista de vehículos.
+     * @returns {Map&lt;string, number>} Mapa de matrícula a costos.
+     */
+    obtenerCostos(vehiculos) {
+        const costos = new Map();
+        for (let i = 0; i &lt; vehiculos.length; i++) {
+            const matricula = vehiculos[i].getMatricula();
+            const costo = vehiculos[i].getFichaMantenimiento().getCostosTotal();
+            costos.set(matricula, costo);
+        }
+        return costos;
+    }
+    /**
+     * Obtiene todas las matrículas presentes en ingresos o costos.
+     * @param {Map&lt;string, number>} ingresos Mapa de ingresos.
+     * @param {Map&lt;string, number>} costos Mapa de costos.
+     * @returns {string[]} Lista de matrículas.
+     */
+    obtenerTodasMatriculas(ingresos, costos) {
+        const todasMatriculas = [];
+        ingresos.forEach((_, matricula) => {
+            if (!todasMatriculas.includes(matricula)) {
+                todasMatriculas.push(matricula);
+            }
+        });
+        costos.forEach((_, matricula) => {
+            if (!todasMatriculas.includes(matricula)) {
+                todasMatriculas.push(matricula);
+            }
+        });
+        return todasMatriculas;
+    }
+    /**
+     * Calcula la rentabilidad de una matrícula específica.
+     * @param {string} matricula Matrícula del vehículo.
+     * @param {Map&lt;string, number>} ingresos Mapa de ingresos.
+     * @param {Map&lt;string, number>} costos Mapa de costos.
+     * @returns {number} Rentabilidad calculada.
+     */
+    calcularRentabilidadPorMatricula(matricula, ingresos, costos) {
+        const ingreso = ingresos.get(matricula) || 0;
+        const costo = costos.get(matricula) || 0;
+        return ingreso - costo;
+    }
+    /**
+     * Calcula la rentabilidad por matrícula para todas las matrículas.
+     * @param {Map&lt;string, number>} ingresos Mapa de ingresos.
+     * @param {Map&lt;string, number>} costos Mapa de costos.
+     * @returns {Map&lt;string, number>} Mapa de matrícula a rentabilidad.
+     */
+    calcularRentabilidad(ingresos, costos) {
+        const rentabilidad = new Map();
+        const todasMatriculas = this.obtenerTodasMatriculas(ingresos, costos);
+        for (let i = 0; i &lt; todasMatriculas.length; i++) {
+            const matricula = todasMatriculas[i];
+            const rent = this.calcularRentabilidadPorMatricula(matricula, ingresos, costos);
+            rentabilidad.set(matricula, rent);
+        }
+        return rentabilidad;
+    }
+    /**
+     * Busca y guarda la matrícula y monto del vehículo más rentable.
+     * @param {Map&lt;string, number>} rentabilidad Mapa de matrícula a rentabilidad.
+     * @returns {void}
+     */
+    buscarMasRentable(rentabilidad) {
+        this.mejorMatricula = "";
+        this.mejorMonto = Number.NEGATIVE_INFINITY;
+        rentabilidad.forEach((monto, matricula) => {
+            if (monto > this.mejorMonto) {
+                this.mejorMonto = monto;
+                this.mejorMatricula = matricula;
+            }
+        });
+    }
+    /**
+     * Busca y guarda la matrícula y monto del vehículo menos rentable.
+     * @param {Map&lt;string, number>} rentabilidad Mapa de matrícula a rentabilidad.
+     * @returns {void}
+     */
+    buscarMenosRentable(rentabilidad) {
+        this.peorMatricula = "";
+        this.peorMonto = Number.POSITIVE_INFINITY;
+        rentabilidad.forEach((monto, matricula) => {
+            if (monto &lt; this.peorMonto) {
+                this.peorMonto = monto;
+                this.peorMatricula = matricula;
+            }
+        });
+    }
+    /**
+     * Calcula la rentabilidad de los vehículos en el período dado.
+     * @param {Alquiler[]} alquileres Lista de alquileres.
+     * @param {Vehiculo[]} vehiculos Lista de vehículos.
+     * @param {RangoDeFechas} [periodo] Período a considerar (obligatorio).
+     * @throws {PeriodoRequeridoException} Si no se provee período.
+     * @throws {EstadisticasInsuficientesException} Si no hay datos suficientes.
+     * @returns {void}
+     */
+    calcular(alquileres, vehiculos, periodo) {
+        this.validarDatosDeEntrada(vehiculos, periodo);
+        const rentabilidadPorVehiculo = this.procesarRentabilidad(alquileres, vehiculos, periodo);
+        this.guardarResultados(rentabilidadPorVehiculo);
+    }
+    /**
+     * Valida que los datos de entrada sean correctos.
+     * @param {Vehiculo[]} vehiculos Lista de vehículos.
+     * @param {RangoDeFechas} [periodo] Período a verificar.
+     * @throws {PeriodoRequeridoException} Si el período es undefined.
+     * @throws {EstadisticasInsuficientesException} Si no hay vehículos.
+     */
+    validarDatosDeEntrada(vehiculos, periodo) {
+        if (!periodo) {
+            throw new exceptions_1.PeriodoRequeridoException("calcular rentabilidad por vehículo");
+        }
+        if (vehiculos.length === 0) {
+            throw new exceptions_1.EstadisticasInsuficientesException("no hay vehículos en la flota");
+        }
+    }
+    /**
+     * Procesa la rentabilidad de los vehículos en el período dado.
+     * @param {Alquiler[]} alquileres Lista de alquileres.
+     * @param {Vehiculo[]} vehiculos Lista de vehículos.
+     * @param {RangoDeFechas} periodo Período a considerar.
+     * @returns {Map&lt;string, number>} Mapa de matrícula a rentabilidad.
+     */
+    procesarRentabilidad(alquileres, vehiculos, periodo) {
+        const alquileresFiltrados = this.filtrarAlquileres(alquileres, periodo);
+        const ingresosDelPeriodo = this.calcularIngresos(alquileresFiltrados);
+        const costosDeMantenimiento = this.obtenerCostos(vehiculos);
+        return this.calcularRentabilidad(ingresosDelPeriodo, costosDeMantenimiento);
+    }
+    /**
+     * Guarda los resultados de los cálculos de rentabilidad.
+     * @param {Map&lt;string, number>} rentabilidadPorVehiculo Mapa de matrícula a rentabilidad.
+     * @returns {void}
+     */
+    guardarResultados(rentabilidadPorVehiculo) {
+        this.buscarMasRentable(rentabilidadPorVehiculo);
+        this.buscarMenosRentable(rentabilidadPorVehiculo);
+    }
+    /**
+     * Devuelve la matrícula y monto del vehículo más rentable.
+     * @returns {{ matricula: string, monto: number }} Objeto con matrícula y monto.
+     */
+    obtenerMasRentable() {
+        return { matricula: this.mejorMatricula, monto: this.mejorMonto };
+    }
+    /**
+     * Devuelve la matrícula y monto del vehículo menos rentable.
+     * @returns {{ matricula: string, monto: number }} Objeto con matrícula y monto.
+     */
+    obtenerMenosRentable() {
+        return { matricula: this.peorMatricula, monto: this.peorMonto };
+    }
+}
+exports.default = CalculadorRentabilidad;
+//# sourceMappingURL=calculadorRentabilidad.js.map</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CalculadorOcupacion.html">CalculadorOcupacion</a></li><li><a href="CalculadorRentabilidad.html">CalculadorRentabilidad</a></li><li><a href="CalculadorVehiculos.html">CalculadorVehiculos</a></li><li><a href="DisponibilidadService.html">DisponibilidadService</a></li><li><a href="DisponibleState.html">DisponibleState</a></li><li><a href="EnAlquilerState.html">EnAlquilerState</a></li><li><a href="EnMantenimientoState.html">EnMantenimientoState</a></li><li><a href="EstadoVehiculoState.html">EstadoVehiculoState</a></li><li><a href="EvaluadorMantenimientoPorCriterios.html">EvaluadorMantenimientoPorCriterios</a></li><li><a href="FichaMantenimiento.html">FichaMantenimiento</a></li><li><a href="GestorReserva.html">GestorReserva</a></li><li><a href="GestorVehiculo.html">GestorVehiculo</a></li><li><a href="RangoDeFechas.html">RangoDeFechas</a></li><li><a href="SistemaAlquiler.html">SistemaAlquiler</a></li></ul><h3>Global</h3><ul><li><a href="global.html#alquilerExceptions_1">alquilerExceptions_1</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Sun Nov 23 2025 14:56:33 GMT-0300 (hora estándar de Argentina)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

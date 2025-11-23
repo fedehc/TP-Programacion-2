@@ -1,3 +1,7 @@
+/**
+ * Representa un cliente del sistema de alquiler de vehículos.
+ * Almacena información personal y de contacto del cliente.
+ */
 export default class Cliente {
     constructor(
         private id: number,

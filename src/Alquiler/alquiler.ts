@@ -11,6 +11,10 @@ import Reserva from "../Reserva/reserva";
 import ISelectorTemporada from "../Temporada/ISelector.temporada";
 import Vehiculo from "../Vehiculo/vehiculo";
 
+/**
+ * Representa un alquiler de un vehículo por un cliente en un rango de fechas determinado.
+ * Gestiona el estado, kilometraje y costos asociados al alquiler.
+ */
 export default class Alquiler {
     constructor(
         private id: string,
@@ -81,15 +85,14 @@ export default class Alquiler {
         const temporada = this.selector.obtener(this.rango.getInicio());
         const costoFinal = temporada.aplicarCostoBase(costoBase);
 
-        /* NOTA PARA EVOLUCIÓN FUTURA:
-         * Si se agregan descuentos, promociones o recargos adicionales, se recomienda:
-         * 1. Extraer esta lógica a una clase ServicioDePrecios o CalculadorPrecio
-         * 2. Implementar patrón Chain of Responsibility con múltiples "ajustes de precio"
-         *    (ej: AjusteTemporada, AjusteDescuentoVIP, AjustePromocion)
-         * 3. Inyectar el servicio en lugar del calendario directo
-         * Por ahora, mantener simple cumple YAGNI (You Aren't Gonna Need It).
-         */
-
+        /* NOTA PARA FUTURAS MEJORAS:
+        * Si en el futuro se agregan descuentos, promociones o recargos, convendría
+        * sacar esta lógica a un servicio de precios (por ejemplo, ServicioDePrecios).
+        *
+        * Ese servicio podría aplicar una cadena de ajustes usando un patrón Decorator
+        * (o, Chain of Responsibility), con cosas como:
+        * AjusteTemporada, AjusteDescuentoVIP, AjustePromocion, etc.
+      */
         return costoFinal;
     }
 

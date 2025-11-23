@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: sistemaAlquiler.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: sistemaAlquiler.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const enums_1 = require("./Extras/enums");
+/**
+ * Clase principal que orquesta la gestión de vehículos, reservas y alquileres.
+ * Permite agregar vehículos, crear y confirmar reservas, buscar disponibilidad y gestionar alquileres.
+ */
+class SistemaAlquiler {
+    gestorVehiculo;
+    gestorReserva;
+    gestorAlquiler;
+    /**
+     * Crea una instancia del sistema de alquiler.
+     * @param gestorVehiculo Gestor de vehículos
+     * @param gestorReserva Gestor de reservas
+     * @param gestorAlquiler Gestor de alquileres
+     */
+    constructor(gestorVehiculo, gestorReserva, gestorAlquiler) {
+        this.gestorVehiculo = gestorVehiculo;
+        this.gestorReserva = gestorReserva;
+        this.gestorAlquiler = gestorAlquiler;
+    }
+    /**
+     * Confirma una reserva con manejo de errores. Si ocurre una excepción,
+     * retorna null y loguea el error en consola.
+     *
+     * @param reserva Reserva a confirmar
+     * @param categoria Categoría del vehículo solicitado
+     * @returns Reserva confirmada o null si hubo error
+     */
+    ConfirmarReservaConManejoErrores(reserva, categoria) {
+        try {
+            return this.ConfirmarReserva(reserva, categoria);
+        }
+        catch (error) {
+            console.error("Error al confirmar reserva:", error);
+            return null;
+        }
+    }
+    /**
+     * Agrega un vehículo al sistema.
+     * @param v Vehículo a agregar
+     */
+    agregarVehiculo(v) {
+        this.gestorVehiculo.agregar(v);
+    }
+    /**
+     * Lista todos los vehículos registrados en el sistema.
+     * @returns Array de vehículos
+     */
+    listarVehiculos() {
+        return this.gestorVehiculo.listar();
+    }
+    /**
+     * Lista todas las reservas existentes.
+     * @returns Array de reservas
+     */
+    listarReservas() {
+        return this.gestorReserva.listar();
+    }
+    /**
+     * Crea una reserva pendiente para un cliente en un rango de fechas.
+     * @param clienteId ID del cliente
+     * @param fechaInicio Fecha de inicio de la reserva
+     * @param fechaFin Fecha de fin de la reserva
+     * @returns Reserva creada en estado pendiente
+     */
+    crearReservaPendiente(clienteId, fechaInicio, fechaFin) {
+        return this.gestorReserva.crearPendiente(clienteId, fechaInicio, fechaFin);
+    }
+    /**
+     * Busca un vehículo disponible de una categoría para un rango de fechas.
+     * @param categoria Categoría del vehículo
+     * @param rangoPedido Rango de fechas solicitado
+     * @returns Vehículo disponible o null si no hay
+     */
+    buscarVehiculoDisponible(categoria, rangoPedido) {
+        const candidatos = this.filtrarPorCategoria(categoria);
+        const operativos = candidatos.filter((v) => this.estaOperativamenteDisponible(v));
+        return this.seleccionarDisponible(operativos, rangoPedido);
+    }
+    /**
+     * Confirma una reserva asignando un vehículo disponible de la categoría solicitada.
+     * @param reserva Reserva a confirmar
+     * @param categoria Categoría del vehículo solicitado
+     * @returns Reserva confirmada
+     */
+    ConfirmarReserva(reserva, categoria) {
+        const vehiculo = this.buscarVehiculoDisponible(categoria, reserva.getRango());
+        return this.gestorReserva.confirmar(reserva, vehiculo);
+    }
+    /**
+     * Inicia los alquileres programados para el día actual.
+     * @param reservas Reservas a iniciar
+     * @param fechaActual Fecha actual (por defecto, hoy)
+     * @returns Array de alquileres iniciados
+     */
+    iniciarAlquileresDelDia(reservas, fechaActual = new Date()) {
+        return this.gestorAlquiler.iniciarAlquileresProgramadosDelDia(reservas, fechaActual);
+    }
+    /**
+     * Finaliza un alquiler, registrando el kilometraje final y la fecha de devolución.
+     * @param alquiler Alquiler a finalizar
+     * @param kmFinal Kilometraje final del vehículo
+     * @param fechaActual Fecha de finalización (por defecto, hoy)
+     */
+    finalizarAlquiler(alquiler, kmFinal, fechaActual = new Date()) {
+        this.gestorAlquiler.finalizar(alquiler, kmFinal, fechaActual);
+    }
+    /**
+     * Lista todos los alquileres registrados en el sistema.
+     * @returns Array de alquileres
+     */
+    listarAlquileres() {
+        return this.gestorAlquiler.listar();
+    }
+    /**
+     * Filtra los vehículos por categoría.
+     * @param categoria Categoría a filtrar
+     * @returns Array de vehículos de la categoría
+     */
+    filtrarPorCategoria(categoria) {
+        return this.gestorVehiculo.filtrarPorCategoria(categoria);
+    }
+    /**
+     * Verifica si un vehículo está disponible operativamente (estado disponible).
+     * @param v Vehículo a verificar
+     * @returns true si está disponible, false si no
+     */
+    estaOperativamenteDisponible(v) {
+        return v.getEstado() === enums_1.EstadoVehiculo.disponible;
+    }
+    /**
+     * Selecciona el primer vehículo disponible en un rango de fechas.
+     * @param candidatos Vehículos candidatos
+     * @param rango Rango de fechas solicitado
+     * @returns Vehículo disponible o null si no hay
+     */
+    seleccionarDisponible(candidatos, rango) {
+        for (const v of candidatos) {
+            if (v.estaDisponible(rango)) {
+                return v;
+            }
+        }
+        return null;
+    }
+}
+exports.default = SistemaAlquiler;
+//# sourceMappingURL=sistemaAlquiler.js.map</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CalculadorOcupacion.html">CalculadorOcupacion</a></li><li><a href="CalculadorRentabilidad.html">CalculadorRentabilidad</a></li><li><a href="CalculadorVehiculos.html">CalculadorVehiculos</a></li><li><a href="DisponibilidadService.html">DisponibilidadService</a></li><li><a href="DisponibleState.html">DisponibleState</a></li><li><a href="EnAlquilerState.html">EnAlquilerState</a></li><li><a href="EnMantenimientoState.html">EnMantenimientoState</a></li><li><a href="EstadoVehiculoState.html">EstadoVehiculoState</a></li><li><a href="EvaluadorMantenimientoPorCriterios.html">EvaluadorMantenimientoPorCriterios</a></li><li><a href="FichaMantenimiento.html">FichaMantenimiento</a></li><li><a href="GestorReserva.html">GestorReserva</a></li><li><a href="GestorVehiculo.html">GestorVehiculo</a></li><li><a href="RangoDeFechas.html">RangoDeFechas</a></li><li><a href="SistemaAlquiler.html">SistemaAlquiler</a></li></ul><h3>Global</h3><ul><li><a href="global.html#alquilerExceptions_1">alquilerExceptions_1</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Sun Nov 23 2025 14:56:33 GMT-0300 (hora estándar de Argentina)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

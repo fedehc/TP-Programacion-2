@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Estadistica/calculadorVehiculos.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Estadistica/calculadorVehiculos.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const exceptions_1 = require("../Excepciones/exceptions");
+/**
+ * Calcula estadísticas de vehículos más y menos alquilados en un período dado.
+ * Permite obtener la matrícula y cantidad de alquileres del vehículo más y menos alquilado.
+ * @implements {ICalculadorVehiculos}
+ */
+class CalculadorVehiculos {
+    masMatricula = "";
+    masCantidad = 0;
+    menosMatricula = "";
+    menosCantidad = 0;
+    /**
+     * Filtra los alquileres que se superponen con el período dado.
+     * @param {Alquiler[]} alquileres Lista de alquileres.
+     * @param {RangoDeFechas} periodo Período a considerar.
+     * @returns {Alquiler[]} Alquileres filtrados.
+     */
+    filtrarAlquileres(alquileres, periodo) {
+        const alquileresFiltrados = [];
+        for (let i = 0; i &lt; alquileres.length; i++) {
+            if (periodo.seSuperponeConOtraFecha(alquileres[i].getRango())) {
+                alquileresFiltrados.push(alquileres[i]);
+            }
+        }
+        return alquileresFiltrados;
+    }
+    /**
+     * Cuenta la cantidad de alquileres por matrícula de vehículo.
+     * @param {Alquiler[]} alquileres Lista de alquileres.
+     * @returns {Map&lt;string, number>} Mapa de matrícula a cantidad de alquileres.
+     */
+    contarPorMatricula(alquileres) {
+        const conteo = new Map();
+        for (let i = 0; i &lt; alquileres.length; i++) {
+            const matricula = alquileres[i].getVehiculo().getMatricula();
+            if (!conteo.has(matricula)) {
+                conteo.set(matricula, 1);
+            }
+            else {
+                const actual = conteo.get(matricula);
+                if (actual !== undefined) {
+                    conteo.set(matricula, actual + 1);
+                }
+                else {
+                    conteo.set(matricula, 1);
+                }
+            }
+        }
+        return conteo;
+    }
+    /**
+     * Busca y guarda la matrícula y cantidad del vehículo más alquilado.
+     * @param {Map&lt;string, number>} conteo Mapa de matrícula a cantidad de alquileres.
+     * @returns {void}
+     */
+    buscarMasAlquilado(conteo) {
+        this.masMatricula = "";
+        this.masCantidad = 0;
+        conteo.forEach((cantidad, matricula) => {
+            if (cantidad > this.masCantidad) {
+                this.masCantidad = cantidad;
+                this.masMatricula = matricula;
+            }
+        });
+    }
+    /**
+     * Busca y guarda la matrícula y cantidad del vehículo menos alquilado.
+     * @param {Map&lt;string, number>} conteo Mapa de matrícula a cantidad de alquileres.
+     * @returns {void}
+     */
+    buscarMenosAlquilado(conteo) {
+        this.menosMatricula = "";
+        this.menosCantidad = Number.POSITIVE_INFINITY;
+        conteo.forEach((cantidad, matricula) => {
+            if (cantidad &lt; this.menosCantidad) {
+                this.menosCantidad = cantidad;
+                this.menosMatricula = matricula;
+            }
+        });
+    }
+    /**
+     * Calcula los vehículos más y menos alquilados en el período dado.
+     * @param {Alquiler[]} alquileres Lista de alquileres.
+     * @param {RangoDeFechas} [periodo] Período a considerar (obligatorio).
+     * @throws {PeriodoRequeridoException} Si no se provee período.
+     * @throws {EstadisticasInsuficientesException} Si no hay datos suficientes.
+     * @returns {void}
+     */
+    calcular(alquileres, periodo) {
+        this.verificarPeriodo(periodo);
+        const conteoDeAlquileres = this.obtenerConteoDelPeriodo(alquileres, periodo);
+        this.guardarResultados(conteoDeAlquileres);
+    }
+    /**
+     * Verifica que el período esté definido.
+     * @param {RangoDeFechas} [periodo] Período a verificar.
+     * @throws {PeriodoRequeridoException} Si el período es undefined.
+     */
+    verificarPeriodo(periodo) {
+        if (!periodo) {
+            throw new exceptions_1.PeriodoRequeridoException("calcular vehículos más/menos alquilados");
+        }
+    }
+    /**
+     * Obtiene el conteo de alquileres por matrícula en el período dado.
+     * @param {Alquiler[]} alquileres Lista de alquileres.
+     * @param {RangoDeFechas} periodo Período a considerar.
+     * @returns {Map&lt;string, number>} Mapa de matrícula a cantidad de alquileres.
+     * @throws {EstadisticasInsuficientesException} Si no hay alquileres en el período.
+     */
+    obtenerConteoDelPeriodo(alquileres, periodo) {
+        const alquileresFiltrados = this.filtrarAlquileres(alquileres, periodo);
+        if (alquileresFiltrados.length === 0) {
+            throw new exceptions_1.EstadisticasInsuficientesException("no hay alquileres en el período especificado");
+        }
+        return this.contarPorMatricula(alquileresFiltrados);
+    }
+    /**
+     * Guarda los resultados de los cálculos de más y menos alquilado.
+     * @param {Map&lt;string, number>} conteoDeAlquileres Mapa de matrícula a cantidad de alquileres.
+     * @returns {void}
+     */
+    guardarResultados(conteoDeAlquileres) {
+        this.buscarMasAlquilado(conteoDeAlquileres);
+        this.buscarMenosAlquilado(conteoDeAlquileres);
+    }
+    /**
+     * Devuelve la matrícula y cantidad del vehículo más alquilado.
+     * @returns {{ matricula: string, cantidad: number }} Objeto con matrícula y cantidad.
+     */
+    obtenerMasAlquilado() {
+        return { matricula: this.masMatricula, cantidad: this.masCantidad };
+    }
+    /**
+     * Devuelve la matrícula y cantidad del vehículo menos alquilado.
+     * @returns {{ matricula: string, cantidad: number }} Objeto con matrícula y cantidad.
+     */
+    obtenerMenosAlquilado() {
+        return { matricula: this.menosMatricula, cantidad: this.menosCantidad };
+    }
+}
+exports.default = CalculadorVehiculos;
+//# sourceMappingURL=calculadorVehiculos.js.map</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CalculadorOcupacion.html">CalculadorOcupacion</a></li><li><a href="CalculadorRentabilidad.html">CalculadorRentabilidad</a></li><li><a href="CalculadorVehiculos.html">CalculadorVehiculos</a></li><li><a href="DisponibilidadService.html">DisponibilidadService</a></li><li><a href="DisponibleState.html">DisponibleState</a></li><li><a href="EnAlquilerState.html">EnAlquilerState</a></li><li><a href="EnMantenimientoState.html">EnMantenimientoState</a></li><li><a href="EstadoVehiculoState.html">EstadoVehiculoState</a></li><li><a href="EvaluadorMantenimientoPorCriterios.html">EvaluadorMantenimientoPorCriterios</a></li><li><a href="FichaMantenimiento.html">FichaMantenimiento</a></li><li><a href="GestorReserva.html">GestorReserva</a></li><li><a href="GestorVehiculo.html">GestorVehiculo</a></li><li><a href="RangoDeFechas.html">RangoDeFechas</a></li><li><a href="SistemaAlquiler.html">SistemaAlquiler</a></li></ul><h3>Global</h3><ul><li><a href="global.html#alquilerExceptions_1">alquilerExceptions_1</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Sun Nov 23 2025 14:56:33 GMT-0300 (hora estándar de Argentina)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
