@@ -1,20 +1,36 @@
 import DisponibilidadService from "../Extras/disponibilidadService";
 import { CategoriaVehiculo, EstadoVehiculo } from "../Extras/enums";
-import RangoDeFechas from "../Extras/rangoDeFechas";
 import FichaMantenimiento from "../Mantenimiento/fichaMantenimiento";
+import RangoDeFechas from "../Extras/rangoDeFechas";
 import Tarifa from "../Tarifa/tarifa";
+import EstadoVehiculoState from "./estadoVehiculoState";
+import DisponibleState from "./disponibleState";
 
 
 export default class Vehiculo {
   private bloqueos: RangoDeFechas[] = [];
-  private fichaMantenimiento?: FichaMantenimiento;
+  private fichaMantenimiento: FichaMantenimiento = new FichaMantenimiento();
+  private estadoState: EstadoVehiculoState;
+  private requiereMantenimiento: boolean = false;
+  private bloqueoMantenimiento?: RangoDeFechas;
+  
   constructor(
     private matricula: string,
     private categoria: CategoriaVehiculo,
-    private estado: EstadoVehiculo = EstadoVehiculo.disponible,
     private tarifa: Tarifa,
     private kilometraje: number
-  ) { }
+  ) {
+    this.estadoState = new DisponibleState();
+  }
+
+  public cambiarEstado(nuevoEstado: EstadoVehiculoState): void {
+    this.estadoState = nuevoEstado;
+  }
+
+  
+  public getEstadoState(): EstadoVehiculoState {
+    return this.estadoState;
+  }
 
   public getMatricula(): string {
     return this.matricula;
@@ -25,7 +41,7 @@ export default class Vehiculo {
   }
 
   public getEstado(): EstadoVehiculo {
-    return this.estado;
+    return this.estadoState.estadoActual();
   }
 
   public getTarifa(): Tarifa {
@@ -36,8 +52,38 @@ export default class Vehiculo {
     return this.kilometraje;
   }
 
-  public setEstado(nuevo: EstadoVehiculo) {
-    this.estado = nuevo;
+  public registrarMantenimiento(fechaActual: Date, kmActual: number, costo: number): void {
+    this.fichaMantenimiento.registrarMantenimiento(fechaActual, kmActual, costo);
+    this.kilometraje = kmActual;
+    if (this.bloqueoMantenimiento) {
+      this.desbloquear(this.bloqueoMantenimiento);
+      this.bloqueoMantenimiento = undefined;
+    }
+  }
+
+
+  public registrarFinalizacion(kmFinal: number, requiereMantenimiento: boolean, fechaActual: Date): void {
+    this.actualizarKilometrajeYEstado(kmFinal, requiereMantenimiento);
+    if (requiereMantenimiento) {
+      this.bloquearVehiculoPorMantenimiento(fechaActual);
+    }
+  }
+
+  private actualizarKilometrajeYEstado(kilometrajeFinal: number, necesitaMantenimiento: boolean): void {
+    this.kilometraje = kilometrajeFinal;
+    this.notificarAlquilerCompletado();
+    this.requiereMantenimiento = necesitaMantenimiento;
+  }
+
+  private bloquearVehiculoPorMantenimiento(fechaInicio: Date): void {
+    const fechaFin = new Date(fechaInicio.getTime() + 24 * 60 * 60 * 1000);
+    this.bloqueoMantenimiento = new RangoDeFechas(fechaInicio, fechaFin);
+    this.bloquear(this.bloqueoMantenimiento);
+  }
+
+
+  public getRequiereMantenimiento(): boolean {
+    return this.requiereMantenimiento;
   }
 
   public setKilometraje(nuevoKilometraje: number) {
@@ -65,23 +111,10 @@ export default class Vehiculo {
   }
 
   public getFichaMantenimiento(): FichaMantenimiento {
-    if (!this.fichaMantenimiento) this.fichaMantenimiento = new FichaMantenimiento();
     return this.fichaMantenimiento;
   }
 
   public notificarAlquilerCompletado(): void {
-    this.getFichaMantenimiento().registrarAlquilerCompletado();
-  }
-
-  public marcarEnMantenimiento(): void {
-    this.estado = EstadoVehiculo.mantenimiento;
-  }
-
-  public marcarLimpieza(): void {
-    this.estado = EstadoVehiculo.limpieza;
-  }
-
-  public marcarDisponible(): void {
-    this.estado = EstadoVehiculo.disponible;
+    this.fichaMantenimiento.registrarAlquilerCompletado();
   }
 }

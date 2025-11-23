@@ -1,7 +1,7 @@
 import CriterioPorAlquileres from "./Mantenimiento/criterioPorAlquileres";
 import CriterioPorKilometraje from "./Mantenimiento/criterioPorKM";
 import CriterioPorMeses from "./Mantenimiento/criterioPorMeses";
-import { CategoriaVehiculo, EstadoVehiculo } from "./Extras/enums";
+import { CategoriaVehiculo } from "./Extras/enums";
 import EvaluadorMantenimientoPorCriterios from "./Mantenimiento/evaluadorMantenimiento";
 import GestorAlquiler from "./Alquiler/gestorAlquiler";
 import GestorReserva from "./Reserva/gestorReserva";
@@ -9,6 +9,7 @@ import GestorVehiculo from "./Vehiculo/gestorVehiculo";
 import SistemaAlquiler from "./sistemaAlquiler";
 import TarifaCompacto from "./Tarifa/tarifaCompacto";
 import Vehiculo from "./Vehiculo/vehiculo";
+import SelectorTemporada from "./Temporada/temporadaSelector";
 
 
 (function main() {
@@ -17,15 +18,18 @@ import Vehiculo from "./Vehiculo/vehiculo";
     new CriterioPorMeses(12),           
     new CriterioPorAlquileres(5),       
   ];
-  const policy = new EvaluadorMantenimientoPorCriterios(criterios);
+  const reglaMantenimiento = new EvaluadorMantenimientoPorCriterios(criterios);
+
+  const selector = new SelectorTemporada();
 
   const gestorVehiculo = new GestorVehiculo();
   const gestorReserva = new GestorReserva();
-  const gestorAlquiler = new GestorAlquiler(policy);
+  const gestorAlquiler = new GestorAlquiler(reglaMantenimiento, selector);
   const sistema = new SistemaAlquiler(gestorVehiculo, gestorReserva, gestorAlquiler);
 
   const tarifa = new TarifaCompacto(30, 0.15);
-  const v1 = new Vehiculo("AA-111-AA", CategoriaVehiculo.compacto, EstadoVehiculo.disponible, tarifa, 10000);
+  // Ajuste: firma de Vehiculo ahora es (matricula, categoria, tarifa, kilometraje)
+  const v1 = new Vehiculo("AA-111-AA", CategoriaVehiculo.compacto, tarifa, 10000);
   gestorVehiculo.agregar(v1);
 
   const hoy = new Date();

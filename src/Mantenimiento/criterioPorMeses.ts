@@ -3,15 +3,15 @@ import FichaMantenimiento from "./fichaMantenimiento";
 
 
 export default class CriterioPorMeses implements ICriterioMantenimiento {
-  constructor(private readonly umbralMeses: number) {}
+  constructor(private umbralMeses: number) {}
 
-  private diffMeses(desde: Date, hasta: Date): number {
+  private diferenciaEnMeses(desde: Date, hasta: Date): number {
     return (hasta.getFullYear() - desde.getFullYear()) * 12 + (hasta.getMonth() - desde.getMonth());
   }
 
   cumple(hoy: Date, kmActual: number, ficha: FichaMantenimiento): boolean {
     const fechaUlt = ficha.getFechaUltimo();
     if (!fechaUlt) return false;
-    return this.diffMeses(fechaUlt, hoy) >= this.umbralMeses;
+    return this.diferenciaEnMeses(fechaUlt, hoy) >= this.umbralMeses;
   }
 }

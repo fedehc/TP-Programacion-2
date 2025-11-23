@@ -60,3 +60,24 @@ export class EstadisticasInsuficientesException extends Error {
     this.name = "EstadisticasInsuficientesException";
   }
 }
+
+export class TransicionEstadoInvalidaException extends Error {
+  constructor(estadoActual: string, accion: string) {
+    super(`No se puede ${accion} desde estado ${estadoActual}.`);
+    this.name = "TransicionEstadoInvalidaException";
+  }
+}
+
+export class VehiculoNoDisponibleException extends Error {
+  constructor(message: string = "Vehículo no disponible para el rango solicitado.") {
+    super(message);
+    this.name = "VehiculoNoDisponibleException";
+  }
+}
+
+export class ReservaNoIniciableException extends Error {
+  constructor(reservaId: string, estadoReserva: string) {
+    super(`Reserva ${reservaId} en estado ${estadoReserva} no permite iniciar alquiler.`);
+    this.name = "ReservaNoIniciableException";
+  }
+}

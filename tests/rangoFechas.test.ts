@@ -1,32 +1,46 @@
 import RangoDeFechas from "../src/Extras/rangoDeFechas";
-describe("RangoDeFechas - pruebas", () => {
-  test("getFin: devuelve la fecha final", () => {
-    const inicio = new Date("2023-01-01");
-    const fin = new Date("2023-01-03");
-    const rango = new RangoDeFechas(inicio, fin);
+import { RangoInvalidoException } from "../src/Excepciones/exceptions";
 
-    expect(rango.getFin().getTime()).toBe(fin.getTime());
+describe("test rangoDeFechasl", () => {
+  test("crea bien inicio y fin", () => {
+    const r = new RangoDeFechas("2024-01-01", "2024-01-03");
+    expect(r.getInicio()).toBeInstanceOf(Date);
+    expect(r.getFin()).toBeInstanceOf(Date);
   });
 
-  test("diasDeDiferencia: 1 al 3 enero -> 2 días", () => {
-    const rangoDosDias = new RangoDeFechas("2023-01-01", "2023-01-03");
-    expect(rangoDosDias.diasDeDiferencia()).toBe(2);
+  test("lanza si inicio >= fin", () => {
+    expect(() => new RangoDeFechas("2024-01-05", "2024-01-05")).toThrowError(/Rango inválido/i);
+    expect(() => new RangoDeFechas("2024-01-06", "2024-01-05")).toThrowError(/Rango inválido/i);
   });
 
-
-  test("esIgualA: detecta rangos idénticos", () => {
-    const rangoA = new RangoDeFechas("2023-01-01", "2023-01-03");
-    const rangoB = new RangoDeFechas("2023-01-01", "2023-01-03");
-    expect(rangoA.esIgualA(rangoB)).toBe(true);
+  test("diasDeDiferencia usa ceil", () => {
+    const r = new RangoDeFechas("2024-02-01", "2024-02-03");
+    expect(r.diasDeDiferencia()).toBe(2);
   });
 
-  test("esMismoDiaQueInicio: ignora horas", () => {
-    const inicioDia = new Date("2023-01-01T05:30:00");
-    const finDia = new Date("2023-01-02T10:00:00");
-    const rangoDia = new RangoDeFechas(inicioDia, finDia);
-    const otraHora = new Date("2023-01-01T23:59:59");
-    expect(rangoDia.esMismoDiaQueInicio(otraHora)).toBe(true);
+  test("superposicion true cuando hay cruce", () => {
+    const a = new RangoDeFechas("2024-03-01", "2024-03-10");
+    const b = new RangoDeFechas("2024-03-05", "2024-03-12");
+    expect(a.seSuperponeConOtraFecha(b)).toBe(true);
   });
 
+  test("superposicion false cuando solo tocan borde", () => {
+    const a = new RangoDeFechas("2024-04-01", "2024-04-05");
+    const b = new RangoDeFechas("2024-04-05", "2024-04-07");
+    expect(a.seSuperponeConOtraFecha(b)).toBe(false);
+  });
+
+  test("esMismoDiaQueInicio reconoce mismo dia", () => {
+    const r = new RangoDeFechas("2024-05-10T10:00:00", "2024-05-12T00:00:00");
+    expect(r.esMismoDiaQueInicio(new Date("2024-05-10T23:59:59"))).toBe(true);
+    expect(r.esMismoDiaQueInicio(new Date("2024-05-11T00:00:00"))).toBe(false);
+  });
+
+  test("esIgualA compara fechas iguales", () => {
+    const r1 = new RangoDeFechas("2024-06-01", "2024-06-02");
+    const r2 = new RangoDeFechas("2024-06-01", "2024-06-02");
+    const r3 = new RangoDeFechas("2024-06-01", "2024-06-03");
+    expect(r1.esIgualA(r2)).toBe(true);
+    expect(r1.esIgualA(r3)).toBe(false);
+  });
 });
-

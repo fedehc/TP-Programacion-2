@@ -4,10 +4,11 @@ import FichaMantenimiento from "../src/Mantenimiento/fichaMantenimiento";
 import DisponibilidadService from "../src/Extras/disponibilidadService";
 import { CategoriaVehiculo, EstadoVehiculo } from "../src/Extras/enums";
 
-describe("Vehiculo - pruebas básicas", () => {
+describe(" test Vehiculo ", () => {
   const rango = new RangoDeFechas(new Date("2023-01-01T00:00:00"), new Date("2023-01-03T00:00:00"));
   const tarifaMock: any = { calcularCosto: jest.fn().mockReturnValue(0) };
-  const vehiculo = new Vehiculo("ABC123", CategoriaVehiculo.compacto, EstadoVehiculo.disponible, tarifaMock, 1000);
+  // El constructor de Vehiculo espera: matricula, categoria, tarifa, kilometraje
+  const vehiculo = new Vehiculo("ABC123", CategoriaVehiculo.compacto, tarifaMock, 1000);
 
   afterEach(() => {
     jest.restoreAllMocks();
@@ -22,14 +23,10 @@ describe("Vehiculo - pruebas básicas", () => {
     expect(vehiculo.getKilometraje()).toBe(1000);
   });
 
-  test("setEstado / setKilometraje: actualiza valores", () => {
-    vehiculo.setEstado(EstadoVehiculo.mantenimiento);
-    expect(vehiculo.getEstado()).toBe(EstadoVehiculo.mantenimiento);
-
+  // No existe setEstado, solo setKilometraje
+  test("setKilometraje: actualiza valores", () => {
     vehiculo.setKilometraje(12345);
     expect(vehiculo.getKilometraje()).toBe(12345);
-
-    vehiculo.setEstado(EstadoVehiculo.disponible);
     vehiculo.setKilometraje(1000);
   });
 
@@ -77,14 +74,5 @@ describe("Vehiculo - pruebas básicas", () => {
   });
 
 
-  test.skip("marcarEnMantenimiento/limpieza/disponible: cambia estado", () => {
-    vehiculo.marcarEnMantenimiento();
-    expect(vehiculo.getEstado()).toBe(EstadoVehiculo.mantenimiento);
-
-    vehiculo.marcarLimpieza();
-    expect(vehiculo.getEstado()).toBe(EstadoVehiculo.limpieza);
-
-    vehiculo.marcarDisponible();
-    expect(vehiculo.getEstado()).toBe(EstadoVehiculo.disponible);
-  });
 });
+

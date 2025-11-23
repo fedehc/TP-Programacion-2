@@ -305,7 +305,7 @@ package "Mantenimiento" {
     }
     class CriterioPorMeses {
         - umbralMeses: number
-        - diffMeses(desde, hasta): number
+        - diferenciaEnMeses(desde, hasta): number
         + cumple(fecha, km, ficha): boolean
     }
     class CriterioPorAlquileres {

@@ -1,54 +1,74 @@
-import GestorAlquiler from "../Alquiler/gestorAlquiler";
+import Alquiler from "../Alquiler/alquiler";
 import RangoDeFechas from "../Extras/rangoDeFechas";
-import GestorVehiculo from "../Vehiculo/gestorVehiculo";
-import CalculadorOcupacion from "./calculadorOcupacion";
-import CalculadorRentabilidad from "./calculadorRentabilidad";
-import CalculadorVehiculos from "./calculadorVehiculos";
+import Vehiculo from "../Vehiculo/vehiculo";
+import ICalculadorOcupacion from "./ICalculadorOcupacion";
+import ICalculadorRentabilidad from "./ICalculadorRentabilidad";
+import { ICalculadorVehiculos } from "./ICalculadorVehiculos";
+
 
 export default class GestorEstadisticas {
-  private calculadorVehiculos: CalculadorVehiculos;
-  private calculadorRentabilidad: CalculadorRentabilidad;
-  private calculadorOcupacion: CalculadorOcupacion;
-
   constructor(
-    private gestorAlquiler: GestorAlquiler,
-    private gestorVehiculo: GestorVehiculo
-  ) {
-    this.calculadorVehiculos = new CalculadorVehiculos();
-    this.calculadorRentabilidad = new CalculadorRentabilidad();
-    this.calculadorOcupacion = new CalculadorOcupacion();
-  }
+    private calculadorVehiculos: ICalculadorVehiculos,
+    private calculadorRentabilidad: ICalculadorRentabilidad,
+    private calculadorOcupacion: ICalculadorOcupacion
+  ) { }
 
-  public obtenerVehiculoMasAlquilado(periodo?: RangoDeFechas): { matricula: string; cantidad: number } {
-    this.calculadorVehiculos.calcular(this.gestorAlquiler.listar(), periodo);
+  /**
+   * Calcula el vehículo más alquilado en un período determinado.
+   * @param alquileres Lista de alquileres a analizar
+   * @param periodo Rango de fechas para filtrar los alquileres
+   * @returns Objeto con la matrícula y cantidad de alquileres
+   */
+  public obtenerVehiculoMasAlquilado(alquileres: Alquiler[], periodo?: RangoDeFechas): { matricula: string; cantidad: number } {
+    this.calculadorVehiculos.calcular(alquileres, periodo);
     return this.calculadorVehiculos.obtenerMasAlquilado();
   }
 
-  public obtenerVehiculoMenosAlquilado(periodo?: RangoDeFechas): { matricula: string; cantidad: number } {
-    this.calculadorVehiculos.calcular(this.gestorAlquiler.listar(), periodo);
+  /**
+   * Calcula el vehículo menos alquilado en un período determinado.
+   * @param alquileres Lista de alquileres a analizar
+   * @param periodo Rango de fechas para filtrar los alquileres
+   * @returns Objeto con la matrícula y cantidad de alquileres
+   */
+  public obtenerVehiculoMenosAlquilado(alquileres: Alquiler[], periodo?: RangoDeFechas): { matricula: string; cantidad: number } {
+    this.calculadorVehiculos.calcular(alquileres, periodo);
     return this.calculadorVehiculos.obtenerMenosAlquilado();
   }
 
-  public obtenerVehiculoMasRentable(periodo?: RangoDeFechas): { matricula: string; monto: number } {
-    this.calculadorRentabilidad.calcular(
-      this.gestorAlquiler.listar(),
-      this.gestorVehiculo.listar(),
-      periodo
-    );
+  /**
+   * Calcula el vehículo con mayor rentabilidad en un período determinado.
+   * Rentabilidad = ingresos por alquiler - costos de mantenimiento
+   * @param alquileres Lista de alquileres a analizar
+   * @param vehiculos Lista de vehículos de la flota
+   * @param periodo Rango de fechas para filtrar los alquileres
+   * @returns Objeto con la matrícula y monto de rentabilidad
+   */
+  public obtenerVehiculoMasRentable(alquileres: Alquiler[], vehiculos: Vehiculo[], periodo?: RangoDeFechas): { matricula: string; monto: number } {
+    this.calculadorRentabilidad.calcular(alquileres, vehiculos, periodo);
     return this.calculadorRentabilidad.obtenerMasRentable();
   }
 
-  public obtenerVehiculoMenosRentable(periodo?: RangoDeFechas): { matricula: string; monto: number } {
-    this.calculadorRentabilidad.calcular(
-      this.gestorAlquiler.listar(),
-      this.gestorVehiculo.listar(),
-      periodo
-    );
+  /**
+   * Calcula el vehículo con menor rentabilidad en un período determinado.
+   * Rentabilidad = ingresos por alquiler - costos de mantenimiento
+   * @param alquileres Lista de alquileres a analizar
+   * @param vehiculos Lista de vehículos de la flota
+   * @param periodo Rango de fechas para filtrar los alquileres
+   * @returns Objeto con la matrícula y monto de rentabilidad
+   */
+  public obtenerVehiculoMenosRentable(alquileres: Alquiler[], vehiculos: Vehiculo[], periodo?: RangoDeFechas): { matricula: string; monto: number } {
+    this.calculadorRentabilidad.calcular(alquileres, vehiculos, periodo);
     return this.calculadorRentabilidad.obtenerMenosRentable();
   }
 
-  public obtenerOcupacionFlota(): { porcentaje: number; enAlquiler: number; total: number } {
-    this.calculadorOcupacion.calcular(this.gestorVehiculo.listar());
+  /**
+   * Calcula el porcentaje de ocupación actual de la flota.
+   * Ocupación = (vehículos en alquiler / total de vehículos) * 100
+   * @param vehiculos Lista de vehículos de la flota
+   * @returns Objeto con el porcentaje, cantidad en alquiler y total
+   */
+  public obtenerOcupacionFlota(vehiculos: Vehiculo[]): { porcentaje: number; enAlquiler: number; total: number } {
+    this.calculadorOcupacion.calcular(vehiculos);
     return this.calculadorOcupacion.obtenerOcupacion();
   }
 }

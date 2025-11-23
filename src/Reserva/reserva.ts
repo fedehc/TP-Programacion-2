@@ -2,8 +2,6 @@ import { EstadoReserva } from "../Extras/enums";
 import RangoDeFechas from "../Extras/rangoDeFechas";
 import Vehiculo from "../Vehiculo/vehiculo";
 
-
-
 export default class Reserva {
   constructor(
     private id: string,
@@ -48,5 +46,9 @@ export default class Reserva {
   public cancelar(): void {
     this.estado = EstadoReserva.cancelada;
     this.vehiculo = undefined;
+  }
+
+  public puedeIniciarAlquiler(): boolean {
+    return this.estado === EstadoReserva.confirmada;
   }
 }
